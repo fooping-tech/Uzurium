@@ -1,0 +1,10 @@
+debug.cfg
+debug_custom.json
+esp32.svd
+
+# build files
+build/
+
+# OS generated files
+.DS_Store
+Thumbs.db

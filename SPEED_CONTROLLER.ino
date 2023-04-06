@@ -30,12 +30,12 @@ void SPEED_ClacDuty(uint32_t deltaTime){
       if(duty<0)duty=0;
 
 }
-
+/*
 bool SQ =false;
 bool CheckSQ(){
   return SQ;
 }
-void StartDuty(int d){
+void SPEED_StartDuty(int d){
   SQ=true;
   startTime=millis();
   cycleTime=millis();
@@ -44,6 +44,7 @@ void StartDuty(int d){
    //Serial set
   SERIAL_SetCheckIndex();
 }
+*/
 void IncreaseDuty(int d){
   duty+=d;
   if(duty>=256)duty=256;
@@ -53,9 +54,9 @@ void DecreaseDuty(int d){
   if(duty<=0)duty=0;
 }
 
-void StopDuty(){
-  SQ=false;
-  //duty =0;
-  TargetRPM=0;
-}
+// void StopDuty(){
+//   SQ=false;
+//   //duty =0;
+//   TargetRPM=0;
+// }
 

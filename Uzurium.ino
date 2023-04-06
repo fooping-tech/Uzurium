@@ -68,7 +68,7 @@ void loop() {
   M5.update();
   uint32_t deltaTime = millis() - cycleTime;
   uint32_t spentTime = millis() - startTime;
-
+/*
   //定期実行タスク
   if(CheckSQ() && deltaTime >=50){
     //RPMを計測する
@@ -88,7 +88,7 @@ void loop() {
     //cycleTimeリセット
     cycleTime = millis();
   }
-
+*/
  Mode mode = Uzurium_GetState();
 
   //MODE_STOP
@@ -100,7 +100,7 @@ void loop() {
   //MODE_A
   if(mode == MODE_A){
     led.pacifica();
-    StopDuty();
+    //StopDuty();
     //led.setbrightness(50);
   }
   //MODE_B
@@ -117,9 +117,12 @@ void loop() {
   }
   //MODE_D
   if(mode == MODE_D){
+    MODE_A_main();
+    /*
     if(!CheckSQ()){
-      StartDuty(0);
+      SPEED_StartDuty(0);
     }
+    */
   }
   
   motor.move(SPEED_CheckDuty());

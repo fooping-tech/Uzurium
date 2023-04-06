@@ -13,7 +13,7 @@ float inRPM=0;//回転開始RPM
 int outDuty=0;//脱調DUTY
 int inDuty=0;//回転開始DUTY
 bool outFlag =false;//脱調フラグ
-bool inFlag =false;
+bool inFlag =false;//回転開始フラグ
 
 void PHOTO_setup(){
   pinMode(PHOTO_PIN,INPUT);
@@ -86,24 +86,19 @@ bool PHOTO_CheckTimeout(){
 
 //脱調判定
 void PHOTO_check(){
-  //rpm start check(RPM変化量10以上、直前RPM 100以下、)
+  //回転開始(RPM変化量10以上、直前RPM 100以下)
     if(diffRPM>10 && beforeRPM<100 && !inFlag){
-      inFlag=true;
-      inDuty=SPEED_CheckDuty();
-      inRPM = nowRPM;
+      inFlag=true;//回転開始フラグを立てる
+      inDuty=SPEED_CheckDuty();//回転開始DUTYを記録
+      inRPM = nowRPM;//回転開始RPMを記録
     }
     //rpm out check(diffRPM>200を脱調と判定)
     if(diffRPM>200 && !outFlag){
       outFlag=true;//脱調フラグ立てる
       outDuty = SPEED_CheckDuty();//脱調時のDUTYを記録
-      outRPM = nowRPM;
+      outRPM = nowRPM;//脱調時のRPMを記録
     }
-    //reset
-    if(CheckSQ() && outFlag){
-      StopDuty();
-      if(nowRPM<100){
-        StartDuty(0);
-        outFlag=false;
-      }
-    }
+}
+bool PHOTO_GetOutFlag(){
+  return outFlag;
 }

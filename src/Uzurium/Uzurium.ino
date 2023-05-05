@@ -41,6 +41,8 @@ void setup() {
   M5.In_I2C.release();
   Wire.begin(25,21);
 
+ //SERIAL_INITIAL
+  SERIAL_setup();
   
   //PIN MODE INITIAL
   PHOTO_setup();
@@ -54,79 +56,73 @@ void setup() {
   //LED_INITIAL
   led.setup(LED_PIN);//led setup (led_num)
 
-  //SERIAL_INITIAL
-  SERIAL_setup();
-
   //ESP-NOW INITIAL
   ESPNOW_setup();
+
+  //Core0でタスク起動
+  xTaskCreatePinnedToCore(
+    Uzurium_Task        // タスク関数へのポインタ。無限ループで終了しないよう関数を指定します
+    ,  "TaskMotion"   // タスクの説明用名前。重複しても動きますがデバッグ用途。最大16文字まで
+    ,  4096  //スタックサイズ(Byte)
+    ,  NULL //作成タスクのパラメータのポインタ
+    ,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest..  优先级，3 (configMAX_PRIORITIES - 1) 最高，0 最低。
+    ,  NULL //作成タスクのHandleへのポインタ
+    ,  0);  //利用するCPUコア(0-1)
+
+  //初期モードにセット
+  Uzurium_SetMode(MODE_D);
 }
 
+void Uzurium_Task(void *pvParameters){
+  while(1){
+    Uzurium_main();
+    delay(1);
+  }
+}
+void Uzurium_main(){
+  Mode mode = Uzurium_GetState();
 
+    //MODE_STOP
+    if(mode == MODE_STOP){
+      led.fade(); // LED Fade OFF
+      SPEED_SetDuty(0); // SPEED set 0;
+    }
+
+    //MODE_A
+    if(mode == MODE_A){
+      MODE_A_main();
+      //StopDuty();
+      //led.setbrightness(50);
+    }
+    //MODE_B
+    if(mode == MODE_B){
+      //FFT_main();
+      //led.fire2(4,SPEED_CheckDuty());// mode ,duty
+      //int brightness = map(SPEED_CheckDuty(),0,256,25,75);
+      //led.setbrightness(brightness);
+    }
+    //MODE_C
+    if(mode == MODE_C){
+      led.fire2(0,SPEED_CheckDuty());
+      //int brightness = map(SPEED_CheckDuty(),0,256,25,75);
+      //led.setbrightness(brightness);
+    }
+    //MODE_D
+    if(mode == MODE_D){
+      led.pacifica();
+    }
+
+    //シリアル入力チェック
+    SERIAL_InputCheck();
+
+}
 
 void loop() {
 
   M5.update();
-  uint32_t deltaTime = millis() - cycleTime;
-  uint32_t spentTime = millis() - startTime;
-/*
-  //定期実行タスク
-  if(CheckSQ() && deltaTime >=50){
-    //RPMを計測する
-    PHOTO_CalcNowRPM();
-    //シリアル通信のデータを書き出す
-    SERIAL_SetSerialData();
-    //エッジがしばらく来ない場合にRPM初期化
-    PHOTO_CheckTimeout();
-    //PID制御によりDUTYを計算する
-    SPEED_ClacDuty(deltaTime);
-    //脱調判定
-    PHOTO_check();
-    //TargetRPM設定
-    if(spentTime>0)PHOTO_Set_TargetRPM(0);
-    if(spentTime>200)PHOTO_Set_TargetRPM(1000);
-    if(spentTime>1000)PHOTO_Set_TargetRPM(PHOTO_Check_outRPM());
-    //cycleTimeリセット
-    cycleTime = millis();
-  }
-*/
- Mode mode = Uzurium_GetState();
+  FFT_main();
+  //uint32_t deltaTime = millis() - cycleTime;
+  //uint32_t spentTime = millis() - startTime;
 
-  //MODE_STOP
-  if(mode == MODE_STOP){
-    led.fade(); // LED Fade OFF
-    SPEED_SetDuty(0); // SPEED set 0;
-  }
-
-  //MODE_A
-  if(mode == MODE_A){
-    led.pacifica();
-    //StopDuty();
-    //led.setbrightness(50);
-  }
-  //MODE_B
-  if(mode == MODE_B){
-    led.fire2(4,SPEED_CheckDuty());// mode ,duty
-    int brightness = map(SPEED_CheckDuty(),0,256,25,75);
-    //led.setbrightness(brightness);
-  }
-  //MODE_C
-  if(mode == MODE_C){
-    led.fire2(0,SPEED_CheckDuty());
-    int brightness = map(SPEED_CheckDuty(),0,256,25,75);
-    //led.setbrightness(brightness);
-  }
-  //MODE_D
-  if(mode == MODE_D){
-    MODE_A_main();
-    /*
-    if(!CheckSQ()){
-      SPEED_StartDuty(0);
-    }
-    */
-  }
   
-  motor.move(SPEED_CheckDuty());
-  
-  SERIAL_InputCheck();
-
 }

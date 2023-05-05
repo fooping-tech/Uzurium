@@ -1,10 +1,37 @@
-uint32_t MODE_A_startTime = 0;//
-uint32_t MODE_A_cycleTime = 0;//
+const int MODE_A_TaskSpan = 50; // タスク実行間隔(ms)
+
+uint32_t MODE_A_startTime = 0;//経過時間
+uint32_t MODE_A_cycleTime = 0;//サイクルタイム
 //uint32_t MODE_A_deltaTime = millis() - MODE_A_cycleTime;
 //uint32_t MODE_A_spentTime = millis() - MODE_A_startTime;
 bool MODE_A_Initialized = false;
-const int MODE_A_TaskSpan = 50; // タスク実行間隔(ms)
 
+
+//初期化処理
+void MODE_A_Init(){
+    //startTimeに現在時刻を設定
+    MODE_A_startTime = millis();
+    //サイクルタイムに現在時刻を設定
+    MODE_A_cycleTime = millis();
+    //duty = d;
+    //TargetRPMを0に設定
+    PHOTO_Set_TargetRPM(0);
+    //Serialに表題情報をセット
+    SERIAL_SetCheckIndex();
+    //初期化フラグを立てる
+    MODE_A_Initialized = true;
+}
+//終了処理
+void MODE_A_Finish(){
+    //初期化フラグを下す
+    MODE_A_Initialized = false;
+    //TargetRPMを0にセットする
+    PHOTO_Set_TargetRPM(0);
+    //MODE_STOPにセットする
+    Uzurium_SetMode(MODE_STOP);
+}
+
+//メイン関数
 void MODE_A_main(){
 
   if(!MODE_A_Initialized){
@@ -26,6 +53,8 @@ void MODE_A_main(){
       PHOTO_CheckTimeout();
       //PID制御によりDUTYを計算する
       SPEED_ClacDuty(deltaTime);
+      //算出したDUTYでモータを回す
+      motor.move(SPEED_CheckDuty());
       //脱調判定
       PHOTO_check();
       //TargetRPM設定
@@ -44,26 +73,3 @@ void MODE_A_main(){
   }
 }
 
-//初期化処理
-void MODE_A_Init(){
-    //startTimeに現在時刻を設定
-    MODE_A_startTime = millis();
-    //サイクルタイムに現在時刻を設定
-    MODE_A_cycleTime = millis();
-    //duty = d;
-    //TargetRPMを0に設定
-    PHOTO_Set_TargetRPM(0);
-    //Serialに表題情報をセット
-    SERIAL_SetCheckIndex();
-    //初期化フラグを立てる
-    MODE_A_Initialized = true;
-}
-
-void MODE_A_Finish(){
-    //初期化フラグを下す
-    MODE_A_Initialized = false;
-    //TargetRPMを0にセットする
-    PHOTO_Set_TargetRPM(0);
-    //MODE_STOPにセットする
-    Uzurium_SetMode(MODE_STOP);
-}

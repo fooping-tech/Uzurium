@@ -5,7 +5,7 @@ void SERIAL_setup(){
   //SERIAL INITIAL
   Serial.begin(115200); //Serial begin
   delay(50);   //delay 50ms.  延迟50ms
-  Serial.println("Connection!");
+  Serial.println("SERIAL setup was completed.");
 }
 
 //Serialに表題情報を書き込む

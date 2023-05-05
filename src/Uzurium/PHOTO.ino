@@ -12,6 +12,7 @@ float inRPM=0;//回転開始RPM
 
 int outDuty=0;//脱調DUTY
 int inDuty=0;//回転開始DUTY
+
 bool outFlag =false;//脱調フラグ
 bool inFlag =false;//回転開始フラグ
 
@@ -19,6 +20,7 @@ void PHOTO_setup(){
   pinMode(PHOTO_PIN,INPUT);
   attachInterrupt(digitalPinToInterrupt(PHOTO_PIN), rpm_fun, FALLING);
   lastmillis = millis(); // タイムアウトのための時間変数を初期化
+  Serial.println("PHOTO setup was completed.");
 
 }
 

@@ -29,6 +29,8 @@ Adafruit_INA219 ina219;
 //PhotoSensor
 #define PHOTO_PIN 19
 
+//Mic
+#define ANALOG_PIN 33
 //PID定数
 const float Kp = 0.0005;
 const float Ki = 0.000001;

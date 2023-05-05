@@ -21,6 +21,7 @@ void RINGLED::setup(int pin){
       break;
   }
   FastLED.setBrightness(25);
+  Serial.println("RINGLED setup was completed.");
 }
 void RINGLED::setbrightness(int vol){
   FastLED.setBrightness(vol);

@@ -5,6 +5,7 @@ void INA219_setup(){
     Serial.println("Failed to find INA219 chip");
     while (1) { delay(10); }
   }
+  Serial.println("INA219 setup was completed.");
 
 }
 

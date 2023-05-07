@@ -1,3 +1,5 @@
+
+
 #include "./configuration.h"
 
 DCMPWM motor = DCMPWM();
@@ -15,12 +17,15 @@ Mode Uzu_mode = MODE_STOP;
 
 //Uzurium MODEをセットする
 void Uzurium_SetMode(Mode mode){
+  //実行中モードをFinishする
+  if(MODE_A_CheckInit())MODE_A_Finish();
+  if(MODE_STOP_CheckInit())MODE_STOP_Finish();
+
   Uzu_mode = mode;
-  //Serial.print("SetState: ");
-  //Serial.println(mode);
+  DUMP(mode);
 }
-//Uzurium 現在のMODEをゲットする
-Mode Uzurium_GetState(){
+//Uzurium 現在のMODEをCheckする
+Mode Uzurium_CheckState(){
   return Uzu_mode;
 }
 
@@ -58,7 +63,9 @@ void setup() {
 
   //ESP-NOW INITIAL
   ESPNOW_setup();
-
+  
+  //Core0 WDT無効化
+  //disableCore0WDT();
   //Core0でタスク起動
   xTaskCreatePinnedToCore(
     Uzurium_Task        // タスク関数へのポインタ。無限ループで終了しないよう関数を指定します
@@ -70,7 +77,7 @@ void setup() {
     ,  0);  //利用するCPUコア(0-1)
 
   //初期モードにセット
-  Uzurium_SetMode(MODE_D);
+  Uzurium_SetMode(MODE_STOP);
 }
 
 void Uzurium_Task(void *pvParameters){
@@ -79,47 +86,79 @@ void Uzurium_Task(void *pvParameters){
     delay(1);
   }
 }
+
+void Uzurium_ClapModeChange(){
+  if(FFT_CheckMagnitude() > 300){
+    
+    //MODE_Aで所定時間以上動作中ならストップ
+    if(MODE_A_CheckInit() == true && MODE_A_CheckSpentTime() >= 1000){
+      TRACE();
+      Uzurium_SetMode(MODE_STOP);
+    }
+    //MODE_Aに入っていないならMODE_Aに入れる
+    if(MODE_STOP_CheckInit() == true && MODE_STOP_CheckSpentTime() >=1000){
+      TRACE();
+      Uzurium_SetMode(MODE_A);
+    }
+  }
+}
+
 void Uzurium_main(){
-  Mode mode = Uzurium_GetState();
+  //モードチェック
+  Mode mode = Uzurium_CheckState();
 
-    //MODE_STOP
-    if(mode == MODE_STOP){
-      led.fade(); // LED Fade OFF
-      SPEED_SetDuty(0); // SPEED set 0;
-    }
+  //MODE_STOP
+  if(mode == MODE_STOP){
+    //MODE_A_Finish();
+    MODE_STOP_main();
+    led.pacifica();
+    //led.fade(); // LED Fade OFF
+    //SPEED_SetDuty(0); // SPEED set 0;
+  }
 
-    //MODE_A
-    if(mode == MODE_A){
-      MODE_A_main();
-      //StopDuty();
-      //led.setbrightness(50);
-    }
-    //MODE_B
-    if(mode == MODE_B){
-      //FFT_main();
-      //led.fire2(4,SPEED_CheckDuty());// mode ,duty
-      //int brightness = map(SPEED_CheckDuty(),0,256,25,75);
-      //led.setbrightness(brightness);
-    }
-    //MODE_C
-    if(mode == MODE_C){
-      led.fire2(0,SPEED_CheckDuty());
-      //int brightness = map(SPEED_CheckDuty(),0,256,25,75);
-      //led.setbrightness(brightness);
-    }
-    //MODE_D
-    if(mode == MODE_D){
-      led.pacifica();
-    }
+  //MODE_A
+  if(mode == MODE_A){
+    MODE_A_main();
+    int mag = FFT_CheckMagnitude();
+    int hue = map(mag,0,256,0,256);
+    led.fire2(4,hue);
 
-    //シリアル入力チェック
-    SERIAL_InputCheck();
+    //StopDuty();
+    //led.setbrightness(50);
+  }
+  //MODE_B
+  if(mode == MODE_B){
+    //FFT_main();
+    //led.fire2(4,SPEED_CheckDuty());// mode ,duty
+    //int brightness = map(SPEED_CheckDuty(),0,256,25,75);
+    //led.setbrightness(brightness);
+  }
+  //MODE_C
+  if(mode == MODE_C){
+    
+    //int brightness = map(SPEED_CheckDuty(),0,256,25,75);
+    int mag = FFT_CheckMagnitude();
+    int hue = map(mag,0,256,0,256);
+    //Serial.println(hue);
+    led.fire2(4,hue);
+    
+    //led.setbrightness(brightness);
+  }
+  //MODE_D
+  if(mode == MODE_D){
+    led.pacifica();
+  }
 
+  //シリアル入力チェック
+  SERIAL_InputCheck();
+  //
+  Uzurium_ClapModeChange();
 }
 
 void loop() {
 
   M5.update();
+  //Uzurium_main();
   FFT_main();
   //uint32_t deltaTime = millis() - cycleTime;
   //uint32_t spentTime = millis() - startTime;

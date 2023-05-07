@@ -1,4 +1,4 @@
-const int MODE_A_TaskSpan = 50; // タスク実行間隔(ms)
+const int MODE_A_TaskSpan = 100; // タスク実行間隔(ms)
 
 uint32_t MODE_A_startTime = 0;//経過時間
 uint32_t MODE_A_cycleTime = 0;//サイクルタイム
@@ -15,22 +15,39 @@ void MODE_A_Init(){
     MODE_A_cycleTime = millis();
     //duty = d;
     //TargetRPMを0に設定
-    PHOTO_Set_TargetRPM(0);
+    //PHOTO_Reset();
+
     //Serialに表題情報をセット
     SERIAL_SetCheckIndex();
     //初期化フラグを立てる
     MODE_A_Initialized = true;
+    //
+    TRACE();
 }
 //終了処理
 void MODE_A_Finish(){
     //初期化フラグを下す
     MODE_A_Initialized = false;
     //TargetRPMを0にセットする
-    PHOTO_Set_TargetRPM(0);
-    //MODE_STOPにセットする
-    Uzurium_SetMode(MODE_STOP);
-}
+    PHOTO_Reset();
 
+    //PID制御によりDUTYを計算する
+    PHOTO_SetDuty(0);
+    //算出したDUTYでモータを回す
+    motor.move(PHOTO_CheckDuty());
+    //MODE_STOPにセットする
+    //Uzurium_SetMode(MODE_STOP);
+    //
+    TRACE();
+}
+//ステータスチェック
+bool MODE_A_CheckInit(){
+  return MODE_A_Initialized;
+}
+//経過時間チェック
+uint32_t MODE_A_CheckSpentTime(){
+  return millis() - MODE_A_startTime;
+}
 //メイン関数
 void MODE_A_main(){
 
@@ -52,20 +69,22 @@ void MODE_A_main(){
       //エッジがしばらく来ない場合にRPM初期化
       PHOTO_CheckTimeout();
       //PID制御によりDUTYを計算する
-      SPEED_ClacDuty(deltaTime);
+      PHOTO_ClacDuty(deltaTime);
       //算出したDUTYでモータを回す
-      motor.move(SPEED_CheckDuty());
+      motor.move(PHOTO_CheckDuty());
       //脱調判定
-      PHOTO_check();
+      PHOTO_CheckOutOfStep();
       //TargetRPM設定
-      if(spentTime>0)PHOTO_Set_TargetRPM(0);
-      if(spentTime>200)PHOTO_Set_TargetRPM(1000);
-      if(spentTime>1000)PHOTO_Set_TargetRPM(PHOTO_Check_outRPM());
+      if(spentTime>0)PHOTO_SetTargetRPM(0);
+      if(spentTime>200)PHOTO_SetTargetRPM(1000);
+      if(spentTime>1000)PHOTO_SetTargetRPM(PHOTO_CheckOutRPM(-100));//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
 
       //脱調していたら
-      if(PHOTO_GetOutFlag()){
+      if(PHOTO_CheckOutFlag()){
+        //Serial.println("------DACCHO!-------");
+        
         //MODE_Aを抜ける
-        MODE_A_Finish();
+        Uzurium_SetMode(MODE_STOP);
       }
       //cycleTimeリセット
       MODE_A_cycleTime = millis();

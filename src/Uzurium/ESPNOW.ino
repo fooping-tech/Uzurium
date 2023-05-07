@@ -72,7 +72,7 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len) {
     }
 //    mode = data[1];
 //    color = data[2];
-    SPEED_SetDuty(data[3]);
+    PHOTO_SetDuty(data[3]);
 //    duty = data[3];
   }
 }

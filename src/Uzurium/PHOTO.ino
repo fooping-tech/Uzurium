@@ -1,3 +1,18 @@
+const int PHOTO_OffsetDutyInitValue = 100;//初期値DUTY
+const int PHOTO_LimitRPMD = 200; //脱調判定回転数変化
+const int PHOTO_StartRPMD = 10;//回転開始回転数変化
+const int PHOTO_LowRPM = 100; //低回転判定閾値
+
+float outRPM=5000;//脱調RPM
+float inRPM=0;//回転開始RPM
+int outDuty=0;//脱調DUTY
+int inDuty=0;//回転開始DUTY
+
+
+//PID
+float P,I,D,preP;
+float duty_p=0;
+int duty=0;
 
 volatile unsigned long lastPulseTime=1;
 volatile unsigned long pulseInterval=100000000;//最大値に設定
@@ -7,43 +22,77 @@ float nowRPM =0;
 float beforeRPM=0;
 float diffRPM=0;
 float TargetRPM = 0;
-float outRPM=5000;//脱調RPM
-float inRPM=0;//回転開始RPM
-
-int outDuty=0;//脱調DUTY
-int inDuty=0;//回転開始DUTY
+int offset=0;//オフセットduty
 
 bool outFlag =false;//脱調フラグ
 bool inFlag =false;//回転開始フラグ
 
 void PHOTO_setup(){
   pinMode(PHOTO_PIN,INPUT);
-  attachInterrupt(digitalPinToInterrupt(PHOTO_PIN), rpm_fun, FALLING);
+  PHOTO_SetInterrupt();
   lastmillis = millis(); // タイムアウトのための時間変数を初期化
+  PHOTO_SetOffsetDuty(PHOTO_OffsetDutyInitValue);//offsetを初期値にセット
   Serial.println("PHOTO setup was completed.");
-
 }
+void PHOTO_Reset(){
+  //RPM平均算出用ストック初期化
+  PHOTO_DeleteNowRPMStock();
+  //RPM初期化
+  rpm=0;
+  nowRPM = 0;
+  beforeRPM = 0;
+  //
+  pulseInterval=100000000;
+  lastPulseTime=1;
+  //ターゲット回転数初期化
+  PHOTO_SetTargetRPM(0);
+  //回転開始DUTYを初期DUTYに設定
+  PHOTO_SetOffsetDuty(inDuty);
+  DUMP(inRPM);
+  DUMP(outRPM);
+  DUMP(inDuty);
+  DUMP(outDuty);
 
-void PHOTO_Set_TargetRPM(float target){
+  P=0;
+  I=0;
+  D=0;
+  duty_p=0;
+}
+// 割り込み解除
+void PHOTO_StopInterrupt(){
+  detachInterrupt(digitalPinToInterrupt(PHOTO_PIN)); 
+}
+// 割り込み設定
+void PHOTO_SetInterrupt(){
+  attachInterrupt(digitalPinToInterrupt(PHOTO_PIN), PHOTO_Measure, FALLING);
+}
+void PHOTO_CalcRPM(){
+  rpm = 60000000 / (pulseInterval);
+}
+void PHOTO_SetTargetRPM(float target){
   TargetRPM = target;
 }
-float PHOTO_Check_TargetRPM(){
+float PHOTO_CheckTargetRPM(){
   return TargetRPM;
 }
 
 
-float PHOTO_Check_rpm(){
+float PHOTO_CheckRpm(){
   return rpm;
 }
 
-float PHOTO_Check_nowRPM(){
+float PHOTO_CheckNowRPM(){
   return nowRPM;
 }
-
-float PHOTO_Check_outRPM(){
-  return outRPM;
+//脱調RPMを返す
+float PHOTO_CheckOutRPM(float margin){
+  return outRPM + margin;
 }
-float PHOTO_Check_diffRPM(){
+float PHOTO_CheckInRPM(float margin){
+  return inRPM + margin;
+}
+
+float PHOTO_CheckDiffRPM(){
   diffRPM = nowRPM - beforeRPM;
   beforeRPM = nowRPM;
   return diffRPM;
@@ -53,6 +102,7 @@ float PHOTO_Check_diffRPM(){
 #define STOCK_RPMS 15
 int stock_rpm[STOCK_RPMS];
 int stock_rpm_num=0;
+
 void PHOTO_CalcNowRPM(){
   stock_rpm_num++;
   if(stock_rpm_num >=STOCK_RPMS){
@@ -68,7 +118,15 @@ void PHOTO_CalcNowRPM(){
   nowRPM = result;
 }
 
-void rpm_fun() {  // タコメーターのパルスが検出されたときに実行する関数
+//RPM_Reset
+void PHOTO_DeleteNowRPMStock(){
+  for(int i = 0;i < STOCK_RPMS;i++){
+    stock_rpm[i]=0;
+  }
+}
+
+// パルスが検出されたときに実行する関数
+void PHOTO_Measure() {  
   unsigned long cur = micros();
   unsigned long dif = cur - lastPulseTime; // 前回のエッジとの差分
   pulseInterval = (pulseInterval - (pulseInterval >> 2)) + (dif >> 2); // 滑らかに
@@ -76,10 +134,14 @@ void rpm_fun() {  // タコメーターのパルスが検出されたときに�
   //pmcount++;
 }
 //タイムアウトしたらrpm初期化
+//フラグを下す(回転開始していない＆脱調していない)
 bool PHOTO_CheckTimeout(){
   if(micros() - lastPulseTime > 100000){
+    TRACE();
     rpm = 0;
     pulseInterval=100000000;
+    inFlag=false;
+    outFlag=false;
     return true;
   }else{
     return false;
@@ -87,20 +149,65 @@ bool PHOTO_CheckTimeout(){
 }
 
 //脱調判定
-void PHOTO_check(){
-  //回転開始(RPM変化量10以上、直前RPM 100以下)
-    if(diffRPM>10 && beforeRPM<100 && !inFlag){
+void PHOTO_CheckOutOfStep(){
+  //回転開始(RPM変化量+*以上、直前RPM ***以下)
+    if(diffRPM>PHOTO_StartRPMD && beforeRPM<PHOTO_LowRPM && !inFlag){
       inFlag=true;//回転開始フラグを立てる
-      inDuty=SPEED_CheckDuty();//回転開始DUTYを記録
-      inRPM = nowRPM;//回転開始RPMを記録
+      //offsetが初期値のときは、回転開始DUTY回転開始DUTYを記録
+      if(offset == PHOTO_OffsetDutyInitValue){
+        inDuty=PHOTO_CheckDuty();
+        inRPM = nowRPM;//回転開始RPMを記録
+      }
     }
-    //rpm out check(diffRPM>200を脱調と判定)
-    if(diffRPM>200 && !outFlag){
+    //rpm out check(diffRPM>PHOTO_LimitRPMDを脱調と判定)
+    if(diffRPM>PHOTO_LimitRPMD && !outFlag){
       outFlag=true;//脱調フラグ立てる
-      outDuty = SPEED_CheckDuty();//脱調時のDUTYを記録
+      outDuty = PHOTO_CheckDuty();//脱調時のDUTYを記録
       outRPM = nowRPM;//脱調時のRPMを記録
+      DUMP(diffRPM);
+      TRACE();
     }
 }
-bool PHOTO_GetOutFlag(){
+bool PHOTO_CheckOutFlag(){
   return outFlag;
+}
+
+
+//Duty直接設定
+void PHOTO_SetDuty(int d){
+  duty = d;
+}
+//現在のDutyを返す
+int PHOTO_CheckDuty(){
+  return duty;
+}
+
+//オフセットDUTYをセットする
+void PHOTO_SetOffsetDuty(int inDuty){
+  offset = inDuty;
+}
+//PID制御によるduty算出
+void PHOTO_ClacDuty(uint32_t deltaTime){
+      P = TargetRPM - nowRPM;
+      I += P * deltaTime;
+      D = (P - preP)/deltaTime;
+      preP = P;
+      //duty += Kp * P + Kd * D + Ki * I;
+      //float duty_f += Kp * P;
+      duty_p += Kp * P + Kd * D;
+      duty = duty_p + offset;
+
+      //上下限すり切り
+      if(duty>=256)duty=256;
+      if(duty<0)duty=0;
+
+}
+
+void PHOTO_IncreaseDuty(int d){
+  duty+=d;
+  if(duty>=256)duty=256;
+}
+void PHOTO_DecreaseDuty(int d){
+  duty-=d;
+  if(duty<=0)duty=0;
 }

@@ -1,8 +1,8 @@
 #include "arduinoFFT.h"
 arduinoFFT FFT;
 
-const uint16_t FFT_SAMPLES = 64; // サンプル数(2^x)
-const int FFT_TaskSpan = 50; // タスク実行間隔(ms)
+const uint16_t FFT_SAMPLES = 128; // サンプル数(2^x)
+const int FFT_TaskSpan = 100; // タスク実行間隔(ms)
 const int FFT_TaskSpan_us = 10; // タスク実行間隔(us)
 
 double vReal[FFT_SAMPLES];  //FFT入力データ
@@ -17,8 +17,8 @@ uint32_t FFT_cycleTime_us = 0;//サイクルタイム[us]
 bool FFT_Initialized = false;//初期化フラグ
 double FFT_SamplingFrequency = 1000000 / FFT_TaskSpan_us;//サンプリング周期
 
-double FFT_Peak=0;  //FFTピーク周波数
-int FFT_Magnitude=0;//音量
+volatile double FFT_Peak=0;  //FFTピーク周波数
+volatile int FFT_Magnitude=0;//音量
 
 //初期化処理
 void FFT_Init(){
@@ -40,6 +40,7 @@ double FFT_CheckPeak(){
   return FFT_Peak;
 }
 int FFT_CheckMagnitude(){
+  //DUMP(FFT_Magnitude);
   return FFT_Magnitude;
 }
 void FFT_Task(void *pvParameters){
@@ -124,13 +125,13 @@ void FFT_CalcFFT(){
   FFT_Magnitude = FFT_CalcMagnitude();
   
   //音量が小さい場合はFFT結果を表示しない
-  if( FFT_Magnitude< 20)FFT_Peak = 0;
+  //if( FFT_Magnitude< 50)FFT_Peak = 0;
 
   //シリアル表示
   
-  Serial.print(FFT_Magnitude);
-  Serial.print(" ");
-  Serial.println(FFT_Peak, 6);
+  //Serial.print(FFT_Magnitude);
+  //Serial.print(" ");
+  //Serial.println(FFT_Peak, 6);
   
 }
 

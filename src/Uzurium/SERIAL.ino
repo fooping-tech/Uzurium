@@ -66,20 +66,22 @@ void SERIAL_SetSerialData(){
   Serial.print(",");
 //  Serial.print(loadvoltage);
 //  Serial.print(",");
-  detachInterrupt(digitalPinToInterrupt(PHOTO_PIN)); // 割り込みを一時的に解除
-  rpm = 60000000 / (pulseInterval); // RPMを求める
+//  detachInterrupt(digitalPinToInterrupt(PHOTO_PIN)); // 割り込みを一時的に解除
+  PHOTO_StopInterrupt();//割り込み解除
+    PHOTO_CalcRPM();// RPMを求める
 
-  Serial.print(PHOTO_Check_rpm());
+    Serial.print(PHOTO_CheckRpm());
+    Serial.print(",");
+    
+    Serial.print(PHOTO_CheckNowRPM());//rpm平均値
+    Serial.print(",");
+    Serial.print(PHOTO_CheckDiffRPM());
+  PHOTO_SetInterrupt();//割り込み再設定
+  //attachInterrupt(digitalPinToInterrupt(PHOTO_PIN), PHOTO_Measure, FALLING); // 割り込みを再設定
   Serial.print(",");
-  
-  Serial.print(PHOTO_Check_nowRPM());//rpm平均値
+  Serial.print(PHOTO_CheckTargetRPM());
   Serial.print(",");
-  Serial.print(PHOTO_Check_diffRPM());
-  attachInterrupt(digitalPinToInterrupt(PHOTO_PIN), rpm_fun, FALLING); // 割り込みを再設定
-  Serial.print(",");
-  Serial.print(PHOTO_Check_TargetRPM());
-  Serial.print(",");
-  Serial.println(SPEED_CheckDuty());
+  Serial.println(PHOTO_CheckDuty());
 
   // if(spentTime>10000)TargetRPM=5000;
   // if(spentTime>14000)TargetRPM=1000;

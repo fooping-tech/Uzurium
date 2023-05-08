@@ -60,6 +60,10 @@ void MODE_STOP_main(){
     uint32_t spentTime = millis() - MODE_STOP_startTime;
     //所定時間以上経過していたら実行
     if(deltaTime >= MODE_STOP_TaskSpan){
+      //PID制御によりDUTYを計算する
+      PHOTO_SetDuty(0);
+      //算出したDUTYでモータを回す
+      motor.move(PHOTO_CheckDuty());
       //cycleTimeリセット
       MODE_STOP_cycleTime = millis();
     }

@@ -117,6 +117,9 @@ void Uzurium_main(){
   }
 
   //MODE_A
+  //学習モード;
+  //回転開始DUTYを記録し、PID制御開始時のオフセットDUTYとして使用し速やかな回転開始を行う
+  //脱調時RPMを記録し、目標回転数が脱調時RPMを超えないように制御する
   if(mode == MODE_A){
     MODE_A_main();
     int mag = FFT_CheckMagnitude();
@@ -127,7 +130,14 @@ void Uzurium_main(){
     //led.setbrightness(50);
   }
   //MODE_B
+  //音量モード;
+  //音量に応じてターゲット回転数を可変する(開発中;レスポンス向上のためにPID定数見直しが必要)
   if(mode == MODE_B){
+    MODE_B_main();
+    int mag = FFT_CheckMagnitude();
+    int hue = map(mag,0,256,0,256);
+    led.fire2(4,hue);
+
     //FFT_main();
     //led.fire2(4,SPEED_CheckDuty());// mode ,duty
     //int brightness = map(SPEED_CheckDuty(),0,256,25,75);

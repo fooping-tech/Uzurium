@@ -54,8 +54,11 @@ Uzuriumは、@FoopingTechによって開発されました。ご意見・ご要�
 # 貢献方法
 
 Uzuriumの改善・発展にご協力いただける方は、以下の方法で貢献してください。
+詳細は[CONTRIBUTING](https://github.com/fooping-tech/Uzurium/blob/0c022eda2cfa34b28f84850665d2f155f35a8e37/CONTRIBUTING.md)を参照してください。
 
 - バグ報告
 - ドキュメントの改善
 - コードの改善
 - 新しい機能の追加
+
+

@@ -76,7 +76,7 @@ void MODE_B_main(){
       PHOTO_CheckOutOfStep();
       //音量を確認
       int mag = FFT_CheckMagnitude();
-      mag = 10*mag;
+      mag = 30*mag;
       //OutRPMより大きくしないように調整
       if(mag > PHOTO_CheckOutRPM(-100))mag = PHOTO_CheckOutRPM(-100);
       //TargetRPM設定

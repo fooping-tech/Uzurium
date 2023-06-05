@@ -53,7 +53,7 @@ void setup() {
   PHOTO_setup();
 
   //INA219_INITIAL
-  INA219_setup();
+  //INA219_setup();
 
   //MOTOR INITIAL
   motor.setup(CHANNEL,MOTOR_PIN);

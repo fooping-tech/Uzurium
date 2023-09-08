@@ -64,6 +64,9 @@ void setup() {
   //ESP-NOW INITIAL
   ESPNOW_setup();
   
+  //SW-INITIAL
+  SW_setup();
+
   //Core0 WDT無効化
   //disableCore0WDT();
   //Core0でタスク起動
@@ -106,6 +109,21 @@ void Uzurium_ClapModeChange(){
 void Uzurium_main(){
   //モードチェック
   Mode mode = Uzurium_CheckState();
+  digitalRead(SW_PIN);
+
+  //SW_
+  if(SW_check()){
+    //MODE_Aで所定時間以上動作中ならストップ
+    if(MODE_A_CheckInit() == true && MODE_A_CheckSpentTime() >= 100){
+      TRACE();
+      Uzurium_SetMode(MODE_STOP);
+    }
+    //MODE_Aに入っていないならMODE_Aに入れる
+    if(MODE_STOP_CheckInit() == true && MODE_STOP_CheckSpentTime() >=100){
+      TRACE();
+      Uzurium_SetMode(MODE_A);
+    }
+  }
 
   //MODE_STOP
   if(mode == MODE_STOP){
@@ -162,7 +180,7 @@ void Uzurium_main(){
   //シリアル入力チェック
   SERIAL_InputCheck();
   //
-  Uzurium_ClapModeChange();
+  //Uzurium_ClapModeChange();
 }
 
 void loop() {

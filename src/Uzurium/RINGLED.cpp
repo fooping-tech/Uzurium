@@ -10,6 +10,9 @@ void RINGLED::setup(int pin){
   //良い解決法求む
   //https://forum.arduino.cc/t/fastled-addleds-with-non-constant-pin-number/622162/8
   switch(pin){
+    case 22:
+      FastLED.addLeds<NEOPIXEL, 22>(leds,NUM_LEDS);
+      break;
     case 26:
       FastLED.addLeds<NEOPIXEL, 26>(leds,NUM_LEDS);
       break;
@@ -17,7 +20,7 @@ void RINGLED::setup(int pin){
       FastLED.addLeds<NEOPIXEL, 32>(leds,NUM_LEDS);
       break;
     default:
-      Serial.println("Unsupported Pin");
+      Serial.println("RINGLED Unsupported Pin");
       break;
   }
   FastLED.setBrightness(25);

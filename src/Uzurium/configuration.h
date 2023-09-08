@@ -18,7 +18,7 @@ Adafruit_INA219 ina219;
 
 
 //motor pin setting
-#define MOTOR_PIN 32 //ATOM:32
+#define MOTOR_PIN 21 //ATOM:32
 //#define MOTOR_PIN 33 //STAMP:33
 
 //UzuriumNumber
@@ -27,7 +27,7 @@ Adafruit_INA219 ina219;
 //PWM CH(for MotorDrive)
 #define CHANNEL 2
 
-#define LED_PIN 26 // M5Atom:26
+#define LED_PIN 22 // M5Atom:26
 //#define LED_PIN 32 //M5Stamp:32
 
 //PhotoSensor
@@ -35,8 +35,11 @@ Adafruit_INA219 ina219;
 
 //Mic
 #define ANALOG_PIN 33
+
+//SW
+#define SW_PIN 25
 //PID定数
-const float Kp = 0.0005;
+float Kp = 0.0001;
 const float Ki = 0.000001;
 const float Kd = 0.01;
 

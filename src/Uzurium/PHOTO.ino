@@ -3,7 +3,12 @@ const int PHOTO_LimitRPMD = 200; //脱調判定回転数変化
 const int PHOTO_StartRPMD = 10;//回転開始回転数変化
 const int PHOTO_LowRPM = 100; //低回転判定閾値
 
-float outRPM=5000;//脱調RPM
+const int MAX_DUTY =200; //0~256
+const int MIN_DUTY =150; //0~256
+
+const int M_DUTY = 0; //回転開始DUTYマージン
+
+float outRPM=6000;//脱調RPM
 float inRPM=0;//回転開始RPM
 int outDuty=0;//脱調DUTY
 int inDuty=0;//回転開始DUTY
@@ -22,7 +27,7 @@ float nowRPM =0;
 float beforeRPM=0;
 float diffRPM=0;
 float TargetRPM = 0;
-int offset=0;//オフセットduty
+int offset=50;//オフセットduty
 
 bool outFlag =false;//脱調フラグ
 bool inFlag =false;//回転開始フラグ
@@ -47,7 +52,10 @@ void PHOTO_Reset(){
   //ターゲット回転数初期化
   PHOTO_SetTargetRPM(0);
   //回転開始DUTYを初期DUTYに設定
-  PHOTO_SetOffsetDuty(inDuty);
+  if(inDuty-M_DUTY>0)PHOTO_SetOffsetDuty(inDuty - M_DUTY);
+  //P項を変更
+  Kp = 0.1;
+
   DUMP(inRPM);
   DUMP(outRPM);
   DUMP(inDuty);
@@ -153,7 +161,7 @@ void PHOTO_CheckOutOfStep(){
   //回転開始(RPM変化量+*以上、直前RPM ***以下)
     if(diffRPM>PHOTO_StartRPMD && beforeRPM<PHOTO_LowRPM && !inFlag){
       inFlag=true;//回転開始フラグを立てる
-      //offsetが初期値のときは、回転開始DUTY回転開始DUTYを記録
+      //offsetが初期値のときは、回転開始DUTYを記録
       if(offset == PHOTO_OffsetDutyInitValue){
         inDuty=PHOTO_CheckDuty();
         inRPM = nowRPM;//回転開始RPMを記録
@@ -183,8 +191,8 @@ int PHOTO_CheckDuty(){
 }
 
 //オフセットDUTYをセットする
-void PHOTO_SetOffsetDuty(int inDuty){
-  offset = inDuty;
+void PHOTO_SetOffsetDuty(int d){
+  offset = d;
 }
 //PID制御によるduty算出
 void PHOTO_ClacDuty(uint32_t deltaTime){
@@ -197,17 +205,17 @@ void PHOTO_ClacDuty(uint32_t deltaTime){
       duty_p += Kp * P + Kd * D;
       duty = duty_p + offset;
 
-      //上下限すり切り
-      if(duty>=256)duty=256;
-      if(duty<0)duty=0;
+      //上下限すり切り,DUTY制限
+      if(duty>=MAX_DUTY)duty=MAX_DUTY;
+      if(duty<MIN_DUTY)duty=MIN_DUTY;
 
 }
 
 void PHOTO_IncreaseDuty(int d){
   duty+=d;
-  if(duty>=256)duty=256;
+  if(duty>=MAX_DUTY)duty=MAX_DUTY;
 }
 void PHOTO_DecreaseDuty(int d){
   duty-=d;
-  if(duty<=0)duty=0;
+  if(duty<=MIN_DUTY)duty=MIN_DUTY;
 }

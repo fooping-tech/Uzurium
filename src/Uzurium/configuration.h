@@ -2,7 +2,7 @@
 #define CONFIGURATION_H
 
 //Debug
-#define ARDUINOTRACE_ENABLE 1  // 0:Disable all traces
+#define ARDUINOTRACE_ENABLE 0  // 0:Disable all traces
 #include <ArduinoTrace.h>
 
 #include <M5Unified.h>

@@ -10,17 +10,18 @@ void SERIAL_setup(){
 
 //Serialに表題情報を書き込む
 void SERIAL_SetCheckIndex(){
-  if(!indexFlag){  //一度だけ実行
-    Serial.print("t_ms");
-    Serial.print(",");
+//  if(!indexFlag){  //一度だけ実行
+  if(true){  //毎回実行
+  //  Serial.print("t_ms");
+  //  Serial.print(",");
   //  Serial.print("shuntvoltage");
   //  Serial.print(",");
   //  Serial.print("busvoltage");
   //  Serial.print(",");
-    Serial.print("current_mA");
-    Serial.print(",");
-    Serial.print("current_mA[ave]");
-    Serial.print(",");
+  //  Serial.print("current_mA");
+  //  Serial.print(",");
+  //  Serial.print("current_mA[ave]");
+  //  Serial.print(",");
   //  Serial.print("loadvoltage");
   //  Serial.print(",");
     Serial.print("rpm");
@@ -54,16 +55,16 @@ void SERIAL_SetSerialData(){
 
   uint32_t spentTime2 = millis();
 
-  Serial.print(spentTime2);
-  Serial.print(",");
+//  Serial.print(spentTime2);
+//  Serial.print(",");
 //  Serial.print(shuntvoltage);
 //  Serial.print(",");
 //  Serial.print(busvoltage);
 //  Serial.print(",");
-  Serial.print(current_mA);
-  Serial.print(",");
-  Serial.print(INA219_AverageCurrent(current_mA));  
-  Serial.print(",");
+//  Serial.print(current_mA);
+//  Serial.print(",");
+//  Serial.print(INA219_AverageCurrent(current_mA));  
+//  Serial.print(",");
 //  Serial.print(loadvoltage);
 //  Serial.print(",");
 //  detachInterrupt(digitalPinToInterrupt(PHOTO_PIN)); // 割り込みを一時的に解除

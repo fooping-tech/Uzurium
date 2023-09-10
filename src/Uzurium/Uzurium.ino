@@ -46,6 +46,8 @@ void setup() {
   M5.In_I2C.release();
   Wire.begin(25,21);
 
+  SERIAL_SetCheckIndex();
+
  //SERIAL_INITIAL
   SERIAL_setup();
   

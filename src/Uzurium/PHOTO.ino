@@ -1,10 +1,10 @@
 const int PHOTO_OffsetDutyInitValue = 100;//初期値DUTY
-const int PHOTO_LimitRPMD = 200; //脱調判定回転数変化
+const int PHOTO_LimitRPMD = 800; //脱調判定回転数変化
 const int PHOTO_StartRPMD = 10;//回転開始回転数変化
 const int PHOTO_LowRPM = 100; //低回転判定閾値
 
 const int MAX_DUTY =200; //0~256
-const int MIN_DUTY =150; //0~256
+const int MIN_DUTY =100; //0~256
 
 const int M_DUTY = 0; //回転開始DUTYマージン
 
@@ -54,7 +54,7 @@ void PHOTO_Reset(){
   //回転開始DUTYを初期DUTYに設定
   if(inDuty-M_DUTY>0)PHOTO_SetOffsetDuty(inDuty - M_DUTY);
   //P項を変更
-  Kp = 0.1;
+  Kp = 0.5;
 
   DUMP(inRPM);
   DUMP(outRPM);

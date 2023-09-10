@@ -76,9 +76,16 @@ void MODE_A_main(){
       PHOTO_CheckOutOfStep();
       //TargetRPM設定
       if(spentTime>0)PHOTO_SetTargetRPM(0);
-      if(spentTime>200)PHOTO_SetTargetRPM(100);
+      if(spentTime>200)PHOTO_SetTargetRPM(500);
       if(spentTime>15000)PHOTO_SetTargetRPM(1000);
-      if(spentTime>30000)PHOTO_SetTargetRPM(PHOTO_CheckOutRPM(-100));//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>25000)PHOTO_SetTargetRPM(3000);
+//      if(spentTime>30000)PHOTO_SetTargetRPM(PHOTO_CheckOutRPM(-100));//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>40000)PHOTO_SetTargetRPM(1000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>50000)PHOTO_SetTargetRPM(3000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>60000)PHOTO_SetTargetRPM(1000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>70000)PHOTO_SetTargetRPM(3000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>80000)PHOTO_SetTargetRPM(6000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>90000)PHOTO_SetTargetRPM(1000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
 
       //脱調していたら
       if(PHOTO_CheckOutFlag()){

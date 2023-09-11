@@ -30,18 +30,16 @@ Uzuriumは、以下の部品から構成されています。
 
 DCモータで磁石を回し、瓶の中の回転子へ動力を伝え渦を発生させます。 電源は据え置きに便利なUSBと持ち運びに便利な電池をサポート。 ESP-NOWで無線接続しており協調制御を実現。
 
-# 必要な部品
 
-Uzuriumを製作するには、以下の部品が必要です。
+# ビルドガイド
 
-- ※準備中
+Uzuriumの制作方法については、[こちら](https://github.com/fooping-tech/Uzurium/blob/main/docs/BuildManual.md)のページに詳細が記載されています。
+制作にあたっては、基本的な電子工作のスキルが必要です。
 
-# 制作方法
 
-Uzuriumの制作方法については、こちらのページに詳細が記載されています。制作にあたっては、基本的な電子工作のスキルが必要です。
+# 回路図
 
-- ※準備中
-
+[Uzurium Board v0.0.0](https://github.com/fooping-tech/Uzurium/blob/main/schematics/SCH_UzuriumCircuit_2023-08-30.pdf)
 
 # ライセンス
 

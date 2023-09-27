@@ -82,7 +82,11 @@ void SERIAL_SetSerialData(){
   Serial.print(",");
   Serial.print(PHOTO_CheckTargetRPM());
   Serial.print(",");
+  Serial.print(duty_p);
+  Serial.print(",");
   Serial.println(PHOTO_CheckDuty());
+
+
 
   // if(spentTime>10000)TargetRPM=5000;
   // if(spentTime>14000)TargetRPM=1000;

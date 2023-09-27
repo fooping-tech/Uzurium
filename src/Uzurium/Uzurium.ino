@@ -59,7 +59,9 @@ void setup() {
 
   //MOTOR INITIAL
   motor.setup(CHANNEL,MOTOR_PIN);
-
+  //MOTOR SLEEP
+  pinMode(21, OUTPUT);
+  digitalWrite(21, HIGH);
   //LED_INITIAL
   led.setup(LED_PIN);//led setup (led_num)
 

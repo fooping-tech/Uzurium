@@ -2,7 +2,7 @@
 #define CONFIGURATION_H
 
 //Debug
-#define ARDUINOTRACE_ENABLE 0  // 0:Disable all traces
+#define ARDUINOTRACE_ENABLE 1  // 0:Disable all traces
 #include <ArduinoTrace.h>
 
 #include <M5Unified.h>
@@ -18,7 +18,7 @@ Adafruit_INA219 ina219;
 
 
 //motor pin setting
-#define MOTOR_PIN 21 //ATOM:32
+#define MOTOR_PIN 23 //ATOM:32
 //#define MOTOR_PIN 33 //STAMP:33
 
 //UzuriumNumber
@@ -39,8 +39,8 @@ Adafruit_INA219 ina219;
 //SW
 #define SW_PIN 25
 //PID定数
-float Kp = 0.0001;
+float Kp = 0.001;
 const float Ki = 0.000001;
-const float Kd = 0.01;
+const float Kd = 1;
 
 #endif

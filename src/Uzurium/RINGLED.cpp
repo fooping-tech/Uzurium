@@ -247,6 +247,19 @@ void fadeall(){
   }
 }
 
+void RINGLED::counter(int count){
+  int color = 100 * count / NUM_LEDS;
+  int turn = count/NUM_LEDS;
+  int counter= count - turn * NUM_LEDS;
+  leds[counter] =  CHSV(color, 255, 255);
+	if(count==0){
+    for(int i = 0; i < NUM_LEDS; i++) {
+      leds[i] = CHSV(0 , 100, 100);
+    }
+  }
+  FastLED.show(); 
+
+}
 
 void RINGLED::fade(){
   FastLED.show(); 

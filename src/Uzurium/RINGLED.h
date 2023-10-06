@@ -12,7 +12,7 @@
 #include <FastLED.h>
 //LED Setting
 #define FPS 120
-#define NUM_LEDS 32
+#define NUM_LEDS 18
 
 
 class RINGLED{
@@ -27,6 +27,7 @@ class RINGLED{
     void stop();
     void pacifica();
     void setbrightness(int);//brightness
+    void counter(int);
 
   private:
     bool _isSetuped;

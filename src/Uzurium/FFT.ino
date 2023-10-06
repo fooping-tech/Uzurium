@@ -4,6 +4,7 @@ arduinoFFT FFT;
 const uint16_t FFT_SAMPLES = 128; // サンプル数(2^x)
 const int FFT_TaskSpan = 100; // タスク実行間隔(ms)
 const int FFT_TaskSpan_us = 10; // タスク実行間隔(us)
+int FFT_ADvalue=0;
 
 double vReal[FFT_SAMPLES];  //FFT入力データ
 double vImag[FFT_SAMPLES];  //FFT入力データ
@@ -84,6 +85,7 @@ void FFT_main(){
 void FFT_Measure(uint32_t deltaTime_us){
   //Analogpinからデータ読み出し
   int value = analogRead(ANALOG_PIN);
+  FFT_ADvalue = value;
   //FFT用バッファにデータをプッシュ
   FFT_PushData(value);
   //サンプリング平均間隔[us]を算出

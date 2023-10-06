@@ -1,10 +1,10 @@
-const int PHOTO_OffsetDutyInitValue = 100;//初期値DUTY
+const int PHOTO_OffsetDutyInitValue = 0;//初期値DUTY
 const int PHOTO_LimitRPMD = 800; //脱調判定回転数変化
 const int PHOTO_StartRPMD = 10;//回転開始回転数変化
 const int PHOTO_LowRPM = 100; //低回転判定閾値
 
 const int MAX_DUTY =200; //0~256
-const int MIN_DUTY =80; //0~256
+const int MIN_DUTY =10; //0~256
 
 const int M_DUTY = 0; //回転開始DUTYマージン
 
@@ -140,12 +140,13 @@ void PHOTO_Measure() {
   pulseInterval = (pulseInterval - (pulseInterval >> 2)) + (dif >> 2); // 滑らかに
   lastPulseTime = cur;
   //pmcount++;
+  MODE_C_CountUp();
 }
 //タイムアウトしたらrpm初期化
 //フラグを下す(回転開始していない＆脱調していない)
 bool PHOTO_CheckTimeout(){
   if(micros() - lastPulseTime > 100000){
-    TRACE();
+    //TRACE();
     rpm = 0;
     pulseInterval=100000000;
     inFlag=false;

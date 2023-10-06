@@ -74,15 +74,17 @@ void MODE_B_main(){
       motor.move(PHOTO_CheckDuty());
       //脱調判定
       PHOTO_CheckOutOfStep();
-      //音量を確認
-      int mag = FFT_CheckMagnitude();
-      mag = 30*mag;
-      //OutRPMより大きくしないように調整
-      if(mag > PHOTO_CheckOutRPM(-100))mag = PHOTO_CheckOutRPM(-100);
       //TargetRPM設定
       if(spentTime>0)PHOTO_SetTargetRPM(0);
-      //if(spentTime>200)PHOTO_SetTargetRPM(1000);
-      if(spentTime>200)PHOTO_SetTargetRPM(mag);
+      if(spentTime>200)PHOTO_SetTargetRPM(1000);
+      if(spentTime>15000)PHOTO_SetTargetRPM(1500);
+      if(spentTime>25000)PHOTO_SetTargetRPM(2000);
+//      if(spentTime>30000)PHOTO_SetTargetRPM(PHOTO_CheckOutRPM(-100));//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>40000)PHOTO_SetTargetRPM(2500);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>50000)PHOTO_SetTargetRPM(3000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>60000)PHOTO_SetTargetRPM(3000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>70000)PHOTO_SetTargetRPM(3000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+
       //脱調していたら
       if(PHOTO_CheckOutFlag()){
         //Serial.println("------DACCHO!-------");

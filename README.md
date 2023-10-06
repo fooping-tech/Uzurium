@@ -44,7 +44,9 @@ Uzuriumの制作方法については、[こちら](https://github.com/fooping-t
 # ライセンス
 
 Uzuriumは、MITライセンスのもとで公開されています。詳細は、LICENSEファイルを参照してください。
-
+また以下を使用しています。
+ [FastLED](https://github.com/FastLED/FastLED/blob/master/LICENSE)
+ 
 # 作者
 
 Uzuriumは、@FoopingTechによって開発されました。ご意見・ご要望などは、IssuesまたはPull Requestにてお寄せください。

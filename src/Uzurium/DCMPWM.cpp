@@ -7,7 +7,7 @@ const uint8_t nBits_forPWM = 8;
 uint8_t PWM_CH = 0;   // PWMチャンネル
 //int PWM_Values = 0; //デューティ　デューティー比 0-256
 //MaxDuty=2^n  DutyRatio = Duty/MaxDuty
-const double PWM_Frequencies[] = {2000.0, 4000.0, 6000.0, 8000.0, 10000.0, 12000.0, 14000.0};
+const double PWM_Frequencies[] = {2000.0, 4000.0, 6000.0, 8000.0, 10000.0, 12000.0, 14000.0,1046,1174,1318,1396,1567,1760,1975,2093};
 // PWM周波数 Maxfreq=80000000.0/2^n[Hz]
 const int nPWM_Frequencies = sizeof(PWM_Frequencies)/sizeof(double);
 
@@ -29,6 +29,9 @@ void DCMPWM::setup(int CH,int PIN){
     _isSetuped =true;
     Serial.println("MOTOR setup was completed.");
   }
+}
+void DCMPWM::changeFreq(int index){
+    ledcSetup(PWM_CH, PWM_Frequencies[index], nBits_forPWM);
 }
 void DCMPWM::move(int duty){
     //Serial.println("MOTOR move");

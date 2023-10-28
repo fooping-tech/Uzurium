@@ -1,4 +1,4 @@
-const int MODE_B_TaskSpan = 100; // タスク実行間隔(ms)
+const int MODE_B_TaskSpan = 10; // タスク実行間隔(ms)
 
 uint32_t MODE_B_startTime = 0;//経過時間
 uint32_t MODE_B_cycleTime = 0;//サイクルタイム
@@ -68,22 +68,31 @@ void MODE_B_main(){
       SERIAL_SetSerialData();
       //エッジがしばらく来ない場合にRPM初期化
       PHOTO_CheckTimeout();
-      //PID制御によりDUTYを計算する
-      PHOTO_ClacDuty(deltaTime);
-      //算出したDUTYでモータを回す
-      motor.move(PHOTO_CheckDuty());
+      //BUZZERを鳴らしていない時
+      if(!BUZZER_CheckInit()){
+         //PID制御によりDUTYを計算する
+        PHOTO_ClacDuty(deltaTime);
+        //算出したDUTYでモータを回す
+        motor.move(PHOTO_CheckDuty());
+        //DUTYに応じてLEDのhueを可変
+        led.fire2(4,PHOTO_CheckDuty());
+      }
+      //Kpをポテンショで可変
+      Kp = map(FFT_ADvalue,0,4095,0,1000) * 0.000001;
+      Serial.print("Kp=");
+      Serial.println(Kp,8);
       //脱調判定
       PHOTO_CheckOutOfStep();
       //TargetRPM設定
-      if(spentTime>0)PHOTO_SetTargetRPM(0);
-      if(spentTime>200)PHOTO_SetTargetRPM(1000);
-      if(spentTime>15000)PHOTO_SetTargetRPM(1500);
-      if(spentTime>25000)PHOTO_SetTargetRPM(2000);
+      if(spentTime>1000)PHOTO_SetTargetRPM(0);
+      if(spentTime>3000) PHOTO_SetTargetRPM(1000);
+      if(spentTime>10000) PHOTO_SetTargetRPM(1500);
+      if(spentTime>15000)PHOTO_SetTargetRPM(2000);
 //      if(spentTime>30000)PHOTO_SetTargetRPM(PHOTO_CheckOutRPM(-100));//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
-      if(spentTime>40000)PHOTO_SetTargetRPM(2500);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
-      if(spentTime>50000)PHOTO_SetTargetRPM(3000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
-      if(spentTime>60000)PHOTO_SetTargetRPM(3000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
-      if(spentTime>70000)PHOTO_SetTargetRPM(3000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>20000)PHOTO_SetTargetRPM(2500);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>25000)PHOTO_SetTargetRPM(3000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>30000)PHOTO_SetTargetRPM(3000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>35000)PHOTO_SetTargetRPM(3000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
 
       //脱調していたら
       if(PHOTO_CheckOutFlag()){

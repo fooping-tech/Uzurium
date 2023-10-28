@@ -1,5 +1,3 @@
-
-
 #include "./configuration.h"
 
 DCMPWM motor = DCMPWM();
@@ -14,16 +12,17 @@ enum Mode{
   MODE_D
 };
 Mode Uzu_mode = MODE_STOP;
-
+int Uzurium_Number = 0;
 //Uzurium MODEをセットする
 void Uzurium_SetMode(Mode mode){
-  DUMP(mode);
+  
   //実行中モードをFinishする
   if(MODE_A_CheckInit())MODE_A_Finish();
   if(MODE_B_CheckInit())MODE_B_Finish();
   if(MODE_C_CheckInit())MODE_C_Finish();
+  if(MODE_D_CheckInit())MODE_D_Finish();
   //if(MODE_STOP_CheckInit())MODE_STOP_Finish();
-  DUMP(mode);
+  
   Uzu_mode = mode;
   DUMP(Uzu_mode);
 }
@@ -31,8 +30,6 @@ void Uzurium_SetMode(Mode mode){
 Mode Uzurium_CheckState(){
   return Uzu_mode;
 }
-
-
 
 unsigned long lastmillis; // タイムアウトのための時間変数
 
@@ -89,6 +86,9 @@ void setup() {
 
   //初期モードにセット
   Uzurium_SetMode(MODE_STOP);
+  BUZZER_On(0);
+  led.setbrightness(LedBrightness);
+
 }
 
 void Uzurium_Task(void *pvParameters){
@@ -116,21 +116,23 @@ void Uzurium_ClapModeChange(){
 
 void Uzurium_main(){
 
-  
-  //digitalRead(SW_PIN);
-  //SW_check2();
   //SW
   int sw = SW_check3();
   if(sw==2){
+    
     bool mode_active=false;
     if(MODE_A_CheckInit() == true && MODE_A_CheckSpentTime() >= 100)mode_active=true;
     if(MODE_B_CheckInit() == true && MODE_B_CheckSpentTime() >= 100)mode_active=true;
     if(MODE_C_CheckInit() == true && MODE_C_CheckSpentTime() >= 100)mode_active=true;
+    if(MODE_D_CheckInit() == true && MODE_D_CheckSpentTime() >= 100)mode_active=true;
     if(mode_active){
       Uzurium_SetMode(MODE_STOP);
+      BUZZER_On(1);
       TRACE();
     }else{
       Uzurium_SetMode(MODE_A);
+      BUZZER_On(0);
+
       TRACE();
     }
   }else if(sw==1){
@@ -139,17 +141,20 @@ void Uzurium_main(){
     if(MODE_A_CheckInit() == true && MODE_A_CheckSpentTime() >= 100)mode_active=true;
     if(MODE_B_CheckInit() == true && MODE_B_CheckSpentTime() >= 100)mode_active=true;
     if(MODE_C_CheckInit() == true && MODE_C_CheckSpentTime() >= 100)mode_active=true;
+    if(MODE_D_CheckInit() == true && MODE_D_CheckSpentTime() >= 100)mode_active=true;
     
     if(mode_active){
       Uzurium_SetMode(MODE_STOP);
+      BUZZER_On(1);
     }else{
       DUMP("MODE_B");
       Uzurium_SetMode(MODE_B);
+      BUZZER_On(0);
+      
     }
   }else if(sw==3){
       DUMP("MODE_C");
       Uzurium_SetMode(MODE_C);
-    
   }
 
 
@@ -159,33 +164,28 @@ void Uzurium_main(){
   if(mode == MODE_STOP){
     //MODE_A_Finish();
     MODE_STOP_main();
-    led.pacifica();
     //led.fade(); // LED Fade OFF
     //SPEED_SetDuty(0); // SPEED set 0;
   }
 
   //MODE_A
-  //学習モード;
-  //回転開始DUTYを記録し、PID制御開始時のオフセットDUTYとして使用し速やかな回転開始を行う
-  //脱調時RPMを記録し、目標回転数が脱調時RPMを超えないように制御する
   if(mode == MODE_A){
-    
     MODE_A_main();
     int mag = FFT_CheckMagnitude();
     int hue = map(mag,0,256,0,256);
-    led.fire2(4,hue);
+    //led.fire2(4,hue);
+    
 
     //StopDuty();
     //led.setbrightness(50);
   }
   //MODE_B
-  //音量モード;
-  //音量に応じてターゲット回転数を可変する(開発中;レスポンス向上のためにPID定数見直しが必要)
   if(mode == MODE_B){
     MODE_B_main();
     int mag = FFT_CheckMagnitude();
     int hue = map(mag,0,256,0,256);
-    led.fire2(4,hue);
+//    led.fire2(4,hue);
+    
 
     //FFT_main();
     //led.fire2(4,SPEED_CheckDuty());// mode ,duty
@@ -195,23 +195,19 @@ void Uzurium_main(){
   //MODE_C
   if(mode == MODE_C){
     MODE_C_main();
-    //int brightness = map(SPEED_CheckDuty(),0,256,25,75);
-    //int mag = FFT_CheckMagnitude();
-    //int hue = map(mag,0,256,0,256);
-    //Serial.println(hue);
-    //led.fire2(4,hue);
-    
-    //led.setbrightness(brightness);
   }
   //MODE_D
   if(mode == MODE_D){
-    led.pacifica();
+    MODE_D_main();    
   }
 
   //シリアル入力チェック
   SERIAL_InputCheck();
   //
   //Uzurium_ClapModeChange();
+  //buzzer
+  BUZZER_main();
+  VR_main();
 }
 
 void loop() {

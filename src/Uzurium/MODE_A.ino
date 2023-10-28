@@ -70,13 +70,20 @@ void MODE_A_main(){
       PHOTO_CheckTimeout();
       //PID制御によりDUTYを計算する
       PHOTO_ClacDuty(deltaTime);
-      //算出したDUTYでモータを回す
-      motor.move(PHOTO_CheckDuty());
-      //ポテンショ対応;DUTYを上書き
-      motor.move(map(FFT_ADvalue,0,4095,0,200));
+      //BUZZERを鳴らしていない時
+      if(!BUZZER_CheckInit()){
+        //算出したDUTYでモータを回す
+        //motor.move(PHOTO_CheckDuty());
+        //ポテンショ対応;DUTYを上書き
+        int duty = map(FFT_ADvalue,0,4095,0,200);
+        motor.move(duty);
+        //DUTYに応じてLEDのhueを可変
+        led.fire2(4,duty+100);
+      }
       //脱調判定
       PHOTO_CheckOutOfStep();
       //TargetRPM設定
+
 /*
       if(spentTime>0)PHOTO_SetTargetRPM(0);
       if(spentTime>200)PHOTO_SetTargetRPM(500);

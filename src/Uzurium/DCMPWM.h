@@ -9,6 +9,7 @@ class DCMPWM{
     void setup(int,int);//pwm ch , pin
     void move(int);//duty
     void stop();
+    void changeFreq(int);
   private:
     bool _isSetuped;
 };

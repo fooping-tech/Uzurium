@@ -3,8 +3,8 @@ const int PHOTO_LimitRPMD = 800; //脱調判定回転数変化
 const int PHOTO_StartRPMD = 10;//回転開始回転数変化
 const int PHOTO_LowRPM = 100; //低回転判定閾値
 
-const int MAX_DUTY =200; //0~256
-const int MIN_DUTY =10; //0~256
+const int MAX_DUTY =50; //0~256
+const int MIN_DUTY =0; //0~256
 
 const int M_DUTY = 0; //回転開始DUTYマージン
 
@@ -27,7 +27,7 @@ float nowRPM =0;
 float beforeRPM=0;
 float diffRPM=0;
 float TargetRPM = 0;
-int offset=50;//オフセットduty
+int offset=0;//オフセットduty
 
 bool outFlag =false;//脱調フラグ
 bool inFlag =false;//回転開始フラグ
@@ -52,7 +52,7 @@ void PHOTO_Reset(){
   //ターゲット回転数初期化
   PHOTO_SetTargetRPM(0);
   //回転開始DUTYを初期DUTYに設定
-  if(inDuty-M_DUTY>0)PHOTO_SetOffsetDuty(inDuty - M_DUTY);
+  //if(inDuty-M_DUTY>0)PHOTO_SetOffsetDuty(inDuty - M_DUTY);
   //P項を変更
   //Kp = 0.5;
 
@@ -65,6 +65,7 @@ void PHOTO_Reset(){
   I=0;
   D=0;
   duty_p=0;
+  duty=0;
 }
 // 割り込み解除
 void PHOTO_StopInterrupt(){

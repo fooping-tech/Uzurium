@@ -26,7 +26,7 @@ void MODE_C_Init(){
     //初期化フラグを立てる
     MODE_C_Initialized = true;
     //
-    led.setbrightness(10);
+    led.setbrightness(LedBrightnessLow);
     TRACE();
 }
 //終了処理
@@ -43,7 +43,7 @@ void MODE_C_Finish(){
     //MODE_STOPにセットする
     //Uzurium_SetMode(MODE_STOP);
     //
-    led.setbrightness(25);
+    led.setbrightness(LedBrightness);
 
     TRACE();
 }
@@ -82,7 +82,9 @@ void MODE_C_main(){
       //算出したDUTYでモータを回す
       //motor.move(PHOTO_CheckDuty());
       //モータ停止
-      motor.move(0);
+      if(!BUZZER_CheckInit()){
+        motor.move(0);
+      }
       //脱調判定
       //PHOTO_CheckOutOfStep();
       //音量を確認

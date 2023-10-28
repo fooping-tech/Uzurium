@@ -31,8 +31,10 @@ void MODE_STOP_Finish(){
     //PHOTO_Reset();
     //PID制御によりDUTYを計算する
     PHOTO_SetDuty(0);
-    //算出したDUTYでモータを回す
-    motor.move(PHOTO_CheckDuty());
+    if(!BUZZER_CheckInit()){
+      //算出したDUTYでモータを回す
+      motor.move(PHOTO_CheckDuty());
+    }
     //MODE_STOPにセットする
     //Uzurium_SetMode(MODE_STOP);
     //
@@ -62,8 +64,15 @@ void MODE_STOP_main(){
     if(deltaTime >= MODE_STOP_TaskSpan){
       //PID制御によりDUTYを計算する
       PHOTO_SetDuty(0);
-      //算出したDUTYでモータを回す
-      motor.move(PHOTO_CheckDuty());
+      //ブザー未使用時
+      if(!BUZZER_CheckInit()){
+        //算出したDUTYでモータを回す
+        motor.move(PHOTO_CheckDuty());
+        //led点灯
+        led.pacifica();
+      }
+      //ポテンショの値をUzuriumNumとして記録
+      Uzurium_Number = VR_CheckValue();
       //cycleTimeリセット
       MODE_STOP_cycleTime = millis();
     }

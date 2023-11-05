@@ -3,7 +3,7 @@ const int PHOTO_LimitRPMD = 800; //脱調判定回転数変化
 const int PHOTO_StartRPMD = 10;//回転開始回転数変化
 const int PHOTO_LowRPM = 100; //低回転判定閾値
 
-const int MAX_DUTY =50; //0~256
+const int MAX_DUTY =100; //0~256
 const int MIN_DUTY =0; //0~256
 
 const int M_DUTY = 0; //回転開始DUTYマージン

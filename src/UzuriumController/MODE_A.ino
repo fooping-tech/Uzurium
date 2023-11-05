@@ -80,6 +80,7 @@ void MODE_A_Init(){
 void MODE_A_Finish(){
     //初期化フラグを下す
     MODE_A_Initialized = false;
+    TRACE();
 }
 
 void MODE_A_AllSQ(int duty,int hue ,int brightness){

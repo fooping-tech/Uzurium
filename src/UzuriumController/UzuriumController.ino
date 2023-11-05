@@ -20,7 +20,8 @@ void FinishMode(){
   MODE_A_Finish();
   MODE_B_Finish();
   MODE_C_Finish();
-
+  MODE_D_Finish();
+  TRACE();
 }
 //Uzurium 現在のMODEをCheckする
 Mode CheckState(){
@@ -31,6 +32,7 @@ void setup(void)
 {
   M5.begin();
   ESPNOW_setup();
+  BUTTON_setup();
   //mac addr
   Serial. println(WiFi.macAddress());
   //Core0 WDT無効化
@@ -77,6 +79,11 @@ void Uzurium_main(void){
     FinishMode();
     SetMode(MODE_C);
   }
+  if(BUTTON_check_red()){
+    send_data(0,1,0,0,0);
+    FinishMode();
+    SetMode(MODE_D);
+  }
   
   //MODE
   if(mode == MODE_STOP){
@@ -90,6 +97,9 @@ void Uzurium_main(void){
   }
   if(mode == MODE_C){
     MODE_C_main();
+  }
+  if(mode == MODE_D){
+    MODE_D_main();
   }
 
 

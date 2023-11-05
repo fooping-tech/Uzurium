@@ -17,7 +17,7 @@ void MODE_D_Init(){
     MODE_D_cycleTime = millis();
     //duty = d;
     //TargetRPMを0に設定
-    //PHOTO_Reset();
+    //photo.Reset();
 
     //Serialに表題情報をセット
     SERIAL_SetCheckIndex();
@@ -31,12 +31,12 @@ void MODE_D_Finish(){
     //初期化フラグを下す
     MODE_D_Initialized = false;
     //TargetRPMを0にセットする
-    PHOTO_Reset();
+    photo.reset();
 
     //PID制御によりDUTYを計算する
-    PHOTO_SetDuty(0);
+    photo.SetDuty(0);
     //算出したDUTYでモータを回す
-    motor.move(PHOTO_CheckDuty());
+    motor.move(photo.CheckDuty());
     //MODE_STOPにセットする
     //Uzurium_SetMode(MODE_STOP);
     //
@@ -66,17 +66,17 @@ void MODE_D_main(){
     //所定時間以上経過していたら実行
     if(deltaTime >= MODE_D_TaskSpan){
       //RPMを計測する
-      PHOTO_CalcNowRPM();
+      photo.CalcNowRPM();
       //シリアル通信のデータを書き出す
       SERIAL_SetSerialData();
       //エッジがしばらく来ない場合にRPM初期化
-      PHOTO_CheckTimeout();
+      photo.CheckTimeout();
       //PID制御によりDUTYを計算する
-      PHOTO_ClacDuty(deltaTime);
+      photo.ClacDuty(deltaTime);
       //BUZZERを鳴らしていない時
       if(!BUZZER_CheckInit()){
         //算出したDUTYでモータを回す
-        //motor.move(PHOTO_CheckDuty());
+        //motor.move(photo.CheckDuty());
         //ポテンショ対応;DUTYを上書き
         //int duty = map(FFT_ADvalue,0,4095,0,200);
         motor.move(ESPNOW_CheckDuty());
@@ -89,11 +89,11 @@ void MODE_D_main(){
         DUMP(ESPNOW_CheckHue());
       }
       //脱調判定
-      PHOTO_CheckOutOfStep();
+      photo.CheckOutOfStep();
       //TargetRPM設定
 
       //脱調していたら
-      if(PHOTO_CheckOutFlag()){
+      if(photo.CheckOutFlag()){
         MODE_D_OutTime = millis();
       }
       //ポテンショの値をUzuriumNumとして記録

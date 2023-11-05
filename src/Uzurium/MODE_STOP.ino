@@ -15,7 +15,7 @@ void MODE_STOP_Init(){
     MODE_STOP_cycleTime = millis();
     //duty = d;
     //TargetRPMを0に設定
-    //PHOTO_Reset();
+    //photo.Reset();
     //Serialに表題情報をセット
     //SERIAL_SetCheckIndex();
     //初期化フラグを立てる
@@ -28,12 +28,12 @@ void MODE_STOP_Finish(){
     //初期化フラグを下す
     MODE_STOP_Initialized = false;
     //TargetRPMを0にセットする
-    //PHOTO_Reset();
+    //photo.Reset();
     //PID制御によりDUTYを計算する
-    PHOTO_SetDuty(0);
+    photo.SetDuty(0);
     if(!BUZZER_CheckInit()){
       //算出したDUTYでモータを回す
-      motor.move(PHOTO_CheckDuty());
+      motor.move(photo.CheckDuty());
     }
     //MODE_STOPにセットする
     //Uzurium_SetMode(MODE_STOP);
@@ -63,11 +63,11 @@ void MODE_STOP_main(){
     //所定時間以上経過していたら実行
     if(deltaTime >= MODE_STOP_TaskSpan){
       //PID制御によりDUTYを計算する
-      PHOTO_SetDuty(0);
+      photo.SetDuty(0);
       //ブザー未使用時
       if(!BUZZER_CheckInit()){
         //算出したDUTYでモータを回す
-        motor.move(PHOTO_CheckDuty());
+        motor.move(photo.CheckDuty());
         //led点灯
         led.pacifica();
       }

@@ -29,12 +29,13 @@ void MODE_A_Finish(){
     //初期化フラグを下す
     MODE_A_Initialized = false;
     //TargetRPMを0にセットする
-    PHOTO_Reset();
-
+    //PHOTO_Reset();
+    photo.reset();
     //PID制御によりDUTYを計算する
-    PHOTO_SetDuty(0);
+    //PHOTO_SetDuty(0);
+    photo.SetDuty(0);
     //算出したDUTYでモータを回す
-    motor.move(PHOTO_CheckDuty());
+    motor.move(photo.CheckDuty());
     //MODE_STOPにセットする
     //Uzurium_SetMode(MODE_STOP);
     //
@@ -63,13 +64,13 @@ void MODE_A_main(){
     //所定時間以上経過していたら実行
     if(deltaTime >= MODE_A_TaskSpan){
       //RPMを計測する
-      PHOTO_CalcNowRPM();
+      photo.CalcNowRPM();
       //シリアル通信のデータを書き出す
       SERIAL_SetSerialData();
       //エッジがしばらく来ない場合にRPM初期化
-      PHOTO_CheckTimeout();
+      photo.CheckTimeout();
       //PID制御によりDUTYを計算する
-      PHOTO_ClacDuty(deltaTime);
+      photo.ClacDuty(deltaTime);
       //BUZZERを鳴らしていない時
       if(!BUZZER_CheckInit()){
         //算出したDUTYでモータを回す
@@ -81,7 +82,7 @@ void MODE_A_main(){
         led.fire2(4,duty+100);
       }
       //脱調判定
-      PHOTO_CheckOutOfStep();
+      photo.CheckOutOfStep();
       //TargetRPM設定
 
 /*
@@ -98,7 +99,7 @@ void MODE_A_main(){
       if(spentTime>90000)PHOTO_SetTargetRPM(1000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
 */
       //脱調していたら
-      if(PHOTO_CheckOutFlag()){
+      if(photo.CheckOutFlag()){
         
         //MODE_Aを抜ける
         Uzurium_SetMode(MODE_STOP);

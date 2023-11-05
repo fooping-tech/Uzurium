@@ -1,3 +1,4 @@
+/*
 const int PHOTO_OffsetDutyInitValue = 0;//初期値DUTY
 const int PHOTO_LimitRPMD = 800; //脱調判定回転数変化
 const int PHOTO_StartRPMD = 10;//回転開始回転数変化
@@ -227,3 +228,4 @@ void PHOTO_DecreaseDuty(int d){
   duty-=d;
   if(duty<=MIN_DUTY)duty=MIN_DUTY;
 }
+*/

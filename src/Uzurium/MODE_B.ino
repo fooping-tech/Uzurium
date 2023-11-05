@@ -29,12 +29,12 @@ void MODE_B_Finish(){
     //初期化フラグを下す
     MODE_B_Initialized = false;
     //TargetRPMを0にセットする
-    PHOTO_Reset();
+    photo.reset();
 
     //PID制御によりDUTYを計算する
-    PHOTO_SetDuty(0);
+    photo.SetDuty(0);
     //算出したDUTYでモータを回す
-    motor.move(PHOTO_CheckDuty());
+    motor.move(photo.CheckDuty());
     //MODE_STOPにセットする
     //Uzurium_SetMode(MODE_STOP);
     //
@@ -63,39 +63,39 @@ void MODE_B_main(){
     //所定時間以上経過していたら実行
     if(deltaTime >= MODE_B_TaskSpan){
       //RPMを計測する
-      PHOTO_CalcNowRPM();
+      photo.CalcNowRPM();
       //シリアル通信のデータを書き出す
       SERIAL_SetSerialData();
       //エッジがしばらく来ない場合にRPM初期化
-      PHOTO_CheckTimeout();
+      photo.CheckTimeout();
       //BUZZERを鳴らしていない時
       if(!BUZZER_CheckInit()){
          //PID制御によりDUTYを計算する
-        PHOTO_ClacDuty(deltaTime);
+        photo.ClacDuty(deltaTime);
         //算出したDUTYでモータを回す
-        motor.move(PHOTO_CheckDuty());
+        motor.move(photo.CheckDuty());
         //DUTYに応じてLEDのhueを可変
-        led.fire2(4,PHOTO_CheckDuty());
+        led.fire2(4,photo.CheckDuty());
       }
       //Kpをポテンショで可変
       Kp = map(FFT_ADvalue,0,4095,0,1000) * 0.000001;
       Serial.print("Kp=");
       Serial.println(Kp,8);
       //脱調判定
-      PHOTO_CheckOutOfStep();
+      photo.CheckOutOfStep();
       //TargetRPM設定
-      if(spentTime>1000)PHOTO_SetTargetRPM(0);
-      if(spentTime>3000) PHOTO_SetTargetRPM(1000);
-      if(spentTime>10000) PHOTO_SetTargetRPM(1500);
-      if(spentTime>15000)PHOTO_SetTargetRPM(2000);
-//      if(spentTime>30000)PHOTO_SetTargetRPM(PHOTO_CheckOutRPM(-100));//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
-      if(spentTime>20000)PHOTO_SetTargetRPM(2500);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
-      if(spentTime>25000)PHOTO_SetTargetRPM(3000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
-      if(spentTime>30000)PHOTO_SetTargetRPM(3000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
-      if(spentTime>35000)PHOTO_SetTargetRPM(3000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>1000)photo.SetTargetRPM(0);
+      if(spentTime>3000) photo.SetTargetRPM(1000);
+      if(spentTime>10000) photo.SetTargetRPM(1500);
+      if(spentTime>15000)photo.SetTargetRPM(2000);
+//      if(spentTime>30000)photo.SetTargetRPM(photo.CheckOutRPM(-100));//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>20000)photo.SetTargetRPM(2500);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>25000)photo.SetTargetRPM(3000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>30000)photo.SetTargetRPM(3000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
+      if(spentTime>35000)photo.SetTargetRPM(3000);//TargetRPMを脱調時RPMに設定(引数はマージンRPM)
 
       //脱調していたら
-      if(PHOTO_CheckOutFlag()){
+      if(photo.CheckOutFlag()){
         //Serial.println("------DACCHO!-------");
         
         //MODE_Bを抜ける

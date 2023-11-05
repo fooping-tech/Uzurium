@@ -2,6 +2,7 @@
 
 DCMPWM motor = DCMPWM();
 RINGLED led = RINGLED();
+PHOTO photo = PHOTO();
 
 //モード定義
 enum Mode{
@@ -53,8 +54,8 @@ void setup() {
   SERIAL_setup();
   
   //PIN MODE INITIAL
-  PHOTO_setup();
-
+  //PHOTO_setup();
+  photo.setup(PHOTO_PIN);
   //INA219_INITIAL
   //INA219_setup();
 

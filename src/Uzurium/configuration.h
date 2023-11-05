@@ -8,6 +8,7 @@
 #include <M5Unified.h>
 #include "DCMPWM.h"
 #include "RINGLED.h"
+#include "PHOTO.h"
 #include <esp_now.h>
 #include <WiFi.h>
 

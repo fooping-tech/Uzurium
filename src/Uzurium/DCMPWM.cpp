@@ -44,3 +44,48 @@ void DCMPWM::stop(){
   int OFF_DUTY= 0;
   ledcWrite(PWM_CH, OFF_DUTY);
 }
+/*
+//メイン関数
+void DCMPWM::main(){
+    //初期化済みの時
+    //前回実行時からの経過時間を計算
+    uint32_t deltaTime = millis() - cycleTime;
+    //経過時間を計算
+    uint32_t spentTime = millis() - startTime;
+      //所定時間以上経過していたら実行
+    if(deltaTime >= TaskSpan){
+      if(pattern==0){
+        if(spentTime>0)changeFreq(8);
+        if(spentTime>100)changeFreq(9);
+        if(spentTime>200)changeFreq(10);
+        if(spentTime>300)changeFreq(11);
+        if(spentTime>400)changeFreq(12);
+        if(spentTime>500)changeFreq(8);
+        if(spentTime>600)BuzzerOff();
+      }
+      if(pattern==1){
+        if(spentTime>0)changeFreq(8);
+        if(spentTime>100)changeFreq(12);
+        if(spentTime>200)changeFreq(11);
+        if(spentTime>300)changeFreq(10);
+        if(spentTime>400)changeFreq(9);
+        if(spentTime>500)changeFreq(8);
+        if(spentTime>600)BuzzerOff();
+      }
+      if(pattern==3){
+        if(spentTime>0)changeFreq(8);
+        if(spentTime>100)changeFreq(9);
+        if(spentTime>200)changeFreq(10);
+        if(spentTime>300)changeFreq(11);
+        if(spentTime>400)changeFreq(12);
+        if(spentTime>500)changeFreq(8);
+        if(spentTime>600)BuzzerOff();
+      }
+      //led.counter(BUZZER_counter);
+      //counter++;
+      //所定時間タスク終了後サイクルタイム初期化
+      cycleTime = millis();
+
+    }
+  
+}*/

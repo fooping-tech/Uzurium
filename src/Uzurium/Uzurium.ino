@@ -14,6 +14,12 @@ enum Mode{
 };
 Mode Uzu_mode = MODE_STOP;
 int Uzurium_Number = 0;
+
+
+
+// モードオブジェクトのポインタ
+MODE *currentMode;
+
 //Uzurium MODEをセットする
 void Uzurium_SetMode(Mode mode){
   
@@ -34,8 +40,6 @@ Mode Uzurium_CheckState(){
 
 unsigned long lastmillis; // タイムアウトのための時間変数
 
-uint32_t startTime = 0;
-uint32_t cycleTime = 0;
 
 void setup() {
 
@@ -72,6 +76,8 @@ void setup() {
   
   //SW-INITIAL
   SW_setup();
+  currentMode = new ADinputMode(&photo,&motor,&led);
+//  currentMode = new MODE();
 
   //Core0 WDT無効化
   //disableCore0WDT();
@@ -86,10 +92,16 @@ void setup() {
     ,  0);  //利用するCPUコア(0-1)
 
   //初期モードにセット
+  TRACE();
   Uzurium_SetMode(MODE_STOP);
+  TRACE();
   BUZZER_On(0);
+  TRACE();
   led.setbrightness(LedBrightness);
+  TRACE();
 
+  
+  TRACE();
 }
 
 void Uzurium_Task(void *pvParameters){
@@ -117,6 +129,11 @@ void Uzurium_ClapModeChange(){
 
 void Uzurium_main(){
 
+  
+// 現在のモードのmainloop()を呼び出す
+  currentMode->mainloop();
+  currentMode->GetAdValue(FFT_CheckADvalue());
+  /*
   //SW
   int sw = SW_check3();
   if(sw==2){
@@ -172,8 +189,9 @@ void Uzurium_main(){
   //MODE_A
   if(mode == MODE_A){
     MODE_A_main();
-    int mag = FFT_CheckMagnitude();
-    int hue = map(mag,0,256,0,256);
+    
+    //int mag = FFT_CheckMagnitude();
+    //int hue = map(mag,0,256,0,256);
     //led.fire2(4,hue);
     
 
@@ -209,6 +227,7 @@ void Uzurium_main(){
   //buzzer
   BUZZER_main();
   VR_main();
+  */
 }
 
 void loop() {

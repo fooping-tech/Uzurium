@@ -13,12 +13,14 @@ class MODE{
       startTime = millis();
       cycleTime = millis();
       adv=0;
+      active=false;
     } 
     ~MODE(){//デストラクタ
     }
     uint32_t CheckSpentTime();
     void mainloop();
     virtual void main();
+    bool active=false;
     void GetAdValue(int value){
       adv = value;
     }
@@ -36,12 +38,12 @@ class MODE{
 class ADinputMode : public MODE {
 public:
     ADinputMode(PHOTO *p,DCMPWM *m,RINGLED *l) : MODE() {
-     Serial.println("ADinputMode_begin");
+     Serial.println("<----ADinputMode_begin---->");
      photo = p;
      motor = m;
      led = l;
+     active=true;
     }
-
     // main関数をオーバーライド
     void main() override {
       // カスタムモードの処理を実装
@@ -74,5 +76,29 @@ public:
       
         
   };
-  
+class StopMode : public MODE {
+public:
+    StopMode(PHOTO *p,DCMPWM *m,RINGLED *l) : MODE() {
+     Serial.println("<----StopMode_begin---->");
+     photo = p;
+     motor = m;
+     led = l;
+     active=false;
+    }
+    // main関数をオーバーライド
+    void main() override {
+        motor->move(0);
+        //DUTYに応じてLEDのhueを可変
+        led->pacifica();
+//      }
+
+    }
+
+    private:
+      DCMPWM *motor;
+      PHOTO *photo;
+      RINGLED *led;
+      
+        
+  };
 #endif

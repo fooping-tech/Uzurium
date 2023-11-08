@@ -76,7 +76,7 @@ void setup() {
   
   //SW-INITIAL
   SW_setup();
-  currentMode = new ADinputMode(&photo,&motor,&led);
+  currentMode = new StopMode(&photo,&motor,&led);
 //  currentMode = new MODE();
 
   //Core0 WDT無効化
@@ -92,16 +92,13 @@ void setup() {
     ,  0);  //利用するCPUコア(0-1)
 
   //初期モードにセット
-  TRACE();
-  Uzurium_SetMode(MODE_STOP);
-  TRACE();
-  BUZZER_On(0);
-  TRACE();
-  led.setbrightness(LedBrightness);
-  TRACE();
 
-  
-  TRACE();
+  Uzurium_SetMode(MODE_STOP);
+
+  BUZZER_On(0);
+
+  led.setbrightness(LedBrightness);
+
 }
 
 void Uzurium_Task(void *pvParameters){
@@ -133,6 +130,17 @@ void Uzurium_main(){
 // 現在のモードのmainloop()を呼び出す
   currentMode->mainloop();
   currentMode->GetAdValue(FFT_CheckADvalue());
+//  DUMP(currentMode->active);
+  int sw = SW_check3();
+  if(sw==1){
+    if(currentMode->active ==true){
+      delete currentMode;
+      currentMode = new StopMode(&photo,&motor,&led);
+    }else{
+      delete currentMode;
+      currentMode = new ADinputMode(&photo,&motor,&led);
+    }
+  }
   /*
   //SW
   int sw = SW_check3();

@@ -14,7 +14,7 @@ class MODE{
       cycleTime = millis();
       adv=0;
       active=false;
-      str="";
+      name="";
       photo = p;
       motor = m;
       led = l;
@@ -25,9 +25,14 @@ class MODE{
     void mainloop();
     virtual void main();
     bool active=false;
-    char* str;
-    void GetAdValue(int value){
+    char* name;
+    void SetAdValue(int value){
       adv = value;
+    }
+    void SetParams(int d,int h,int b){
+      _duty =d;
+      _hue = h;
+      _brightness = b;
     }
     void InitFunction();
     
@@ -44,6 +49,9 @@ class MODE{
     DCMPWM *motor;
     PHOTO *photo;
     RINGLED *led;
+    int _duty=0;
+    int _hue=0;
+    int _brightness=0;
 };
 
 /*
@@ -73,6 +81,7 @@ public:
      motor = m;
      led = l;
      active=true;
+     name="ADinputMode";
      _InitMode=2;
     }
   
@@ -81,15 +90,10 @@ public:
       // カスタムモードの処理を実装
       //RPMを計測する
       photo->CalcNowRPM();
-      //シリアル通信のデータを書き出す
-      //SERIAL_SetSerialData();
       //エッジがしばらく来ない場合にRPM初期化
       photo->CheckTimeout();
       //PID制御によりDUTYを計算する
       photo->ClacDuty(deltaTime);
-      //BUZZERを鳴らしていない時
-      //算出したDUTYでモータを回す
-
       //ポテンショ対応;DUTYを上書き
       int duty = map(adv,0,4095,0,200);
       photo->SetDuty(duty);
@@ -125,6 +129,7 @@ public:
      motor = m;
      led = l;
      active=false;
+     name="StopMode";
      _InitMode=0;//初期化時のブザーモード
     }
     // main関数をオーバーライド
@@ -149,6 +154,8 @@ public:
      active=true;
      startTime = millis();
      _InitMode=1;
+     TaskSpan=10;
+     name="FeedBackMode";
     }
     // main関数をオーバーライド
     void main() override {
@@ -215,6 +222,7 @@ public:
      led = l;
      active=true;
      _InitMode=3;
+     name="PhotoReflectorInspectionMode";
     }
     // main関数をオーバーライド
     void main() override {
@@ -234,6 +242,7 @@ public:
      motor = m;
      led = l;
      active=true;
+     name="LedInspectionMode";
     }
     // main関数をオーバーライド
     void main() override {
@@ -253,4 +262,26 @@ public:
     private:
 
 };
+
+class RemoteControlMode : public MODE {
+public:
+    RemoteControlMode(PHOTO *p,DCMPWM *m,RINGLED *l) : MODE(p,m,l) {
+     Serial.println("<----RemoteControlMode_begin---->");
+     photo = p;
+     motor = m;
+     led = l;
+     active=true;
+     _InitMode=0;//初期化時のブザーモード
+     name="RemoteControlMode";
+    }
+    // main関数をオーバーライド
+    void main() override {
+        motor->move(_duty);
+        //DUTYに応じてLEDのhueを可変
+        led->fire2(4,_hue);
+        led->setbrightness(_brightness);
+    }
+  private:
+
+  };
 #endif

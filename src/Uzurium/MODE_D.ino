@@ -1,3 +1,4 @@
+/*
 const int MODE_D_TaskSpan = 10; // タスク実行間隔(ms)
 
 uint32_t MODE_D_startTime = 0;//経過時間
@@ -103,4 +104,4 @@ void MODE_D_main(){
     }
   }
 }
-
+*/

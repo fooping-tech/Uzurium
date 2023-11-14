@@ -1,3 +1,4 @@
+/*
 //表題情報設定状態;設定済:true 未設定:false
 bool indexFlag=false;
 
@@ -47,11 +48,11 @@ void SERIAL_SetSerialData(){
   float loadvoltage = 0;
   float power_mW = 0;
 
-  shuntvoltage = ina219.getShuntVoltage_mV();
-  busvoltage = ina219.getBusVoltage_V();
-  current_mA = ina219.getCurrent_mA();
-  power_mW = ina219.getPower_mW();
-  loadvoltage = busvoltage + (shuntvoltage / 1000);
+//  shuntvoltage = ina219.getShuntVoltage_mV();
+//  busvoltage = ina219.getBusVoltage_V();
+//  current_mA = ina219.getCurrent_mA();
+//  power_mW = ina219.getPower_mW();
+//  loadvoltage = busvoltage + (shuntvoltage / 1000);
 
   uint32_t spentTime2 = millis();
 
@@ -131,3 +132,4 @@ void SERIAL_InputCheck(){
     //Serial通信切断時の処理
   }
 }
+*/

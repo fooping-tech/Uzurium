@@ -1,4 +1,4 @@
-
+/*
 void INA219_setup(){
 //INA219
   if (! ina219.begin()) {
@@ -27,3 +27,4 @@ float INA219_AverageCurrent(float current_mA){
   result = result/STOCK_CURRENT;
   return result;
 }
+*/

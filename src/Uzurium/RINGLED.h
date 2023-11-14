@@ -29,6 +29,7 @@ class RINGLED{
     void pacifica();
     void setbrightness(int);//brightness
     void counter(int);
+    void level(int);
 
   private:
     bool _isSetuped;

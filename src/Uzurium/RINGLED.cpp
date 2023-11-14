@@ -263,19 +263,31 @@ void RINGLED::inspection(int color){
   FastLED.show(); 
 }
 void RINGLED::counter(int count){
+  Serial.println(count);
   int color = 100 * count / NUM_LEDS;
   int turn = count/NUM_LEDS;
   int counter= count - turn * NUM_LEDS;
   leds[counter] =  CHSV(color, 255, 255);
-	if(count==0){
+//  for(int i = 1; i < NUM_LEDS;i++){
+//    if(count<=i && i<NUM_LEDS)leds[i] = CHSV(0,0,0);
+//	}
+  if(count==0){
     for(int i = 0; i < NUM_LEDS; i++) {
-      leds[i] = CHSV(0 , 100, 100);
+      leds[i] = CHSV(0 , 0, 0);
     }
   }
   FastLED.show(); 
 
 }
 
+void RINGLED::level(int count){
+  for(int i = 0; i < NUM_LEDS;i++){
+    if(0<=i && i<count)leds[i] = CHSV(i*10,255,255);
+    if(count<=i && i<NUM_LEDS)leds[i] = CHSV(0,0,0);
+	}
+  FastLED.show(); 
+
+}
 void RINGLED::fade(){
   FastLED.show(); 
   fadeall();

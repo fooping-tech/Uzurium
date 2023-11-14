@@ -24,10 +24,10 @@ MODE *currentMode;
 void Uzurium_SetMode(Mode mode){
   
   //実行中モードをFinishする
-  if(MODE_A_CheckInit())MODE_A_Finish();
+/*  if(MODE_A_CheckInit())MODE_A_Finish();
   if(MODE_B_CheckInit())MODE_B_Finish();
   if(MODE_C_CheckInit())MODE_C_Finish();
-  if(MODE_D_CheckInit())MODE_D_Finish();
+  if(MODE_D_CheckInit())MODE_D_Finish();*/
   //if(MODE_STOP_CheckInit())MODE_STOP_Finish();
   
   Uzu_mode = mode;
@@ -50,13 +50,16 @@ void setup() {
 
   M5.begin(cfg);
   M5.In_I2C.release();
-  //Wire.begin(25,21);
+  Wire.begin(25,21);
 
-  SERIAL_SetCheckIndex();
+  //SERIAL_SetCheckIndex();
 
  //SERIAL_INITIAL
-  SERIAL_setup();
-  
+  //SERIAL_setup();
+  Serial.begin(115200); //Serial begin
+  delay(50);   //delay 50ms.  延迟50ms
+  Serial.println("SERIAL setup was completed.");
+
   //PIN MODE INITIAL
   //PHOTO_setup();
   photo.setup(PHOTO_PIN);
@@ -114,8 +117,12 @@ void Uzurium_main(){
   
 // 現在のモードのmainloop()を呼び出す
   currentMode->mainloop();
-  currentMode->GetAdValue(FFT_CheckADvalue());
-
+  currentMode->SetAdValue(FFT_CheckADvalue());
+  //所定モードの時のみ実行
+  if(currentMode->name=="RemoteControlMode"){
+    currentMode->SetParams(ESPNOW_CheckDuty(),ESPNOW_CheckHue(),ESPNOW_CheckBrightness());
+    Uzurium_Number = VR_CheckValue();
+  }
   //スイッチリード(モーメンタリ)
   int sw = SW_check3();
   //スイッチリード(オルタネート)
@@ -160,7 +167,7 @@ void Uzurium_main(){
         currentMode = new StopMode(&photo,&motor,&led);
       }else{
         delete currentMode;
-        currentMode = new FeedBackMode(&photo,&motor,&led);
+        currentMode = new RemoteControlMode(&photo,&motor,&led);
       }
     }
     if(sw==3){

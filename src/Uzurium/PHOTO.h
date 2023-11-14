@@ -5,16 +5,17 @@
 
 #define STOCK_RPMS 15
 
-
-
-
 class PHOTO{
+  static volatile int counter;
+  static volatile unsigned long lastPulseTime;
+  static volatile unsigned long pulseInterval;
+  static volatile uint16_t rpm; // RPMの変数 uint16_t:65535rpmまで計測可能
   public:
     PHOTO();
     void setup(int);
     void reset();
-    void StopInterrupt();
-    void SetInterrupt();
+    static void StopInterrupt();
+    static void SetInterrupt();
     void CalcRPM();
     void SetTargetRPM(float);
     float CheckTargetRPM();
@@ -36,6 +37,8 @@ class PHOTO{
     void IncreaseDuty(int);
     void DecreaseDuty(int);
     int CheckCounter();
+    void SetKp(float);
+    static void Measure(); //digitalPinToInterruptの引数で読み込むために静的メンバ関数として定義
 
   private:
     bool _isSetuped;
@@ -47,7 +50,7 @@ class PHOTO{
     const int _MIN_DUTY; //0~256 =0
     const int _M_DUTY; //回転開始DUTYマージン = 0
 
-    int photo_pin;
+    static int photo_pin;
 
     float outRPM;//脱調RPM=6000
     float inRPM;//回転開始RPM=0
@@ -62,11 +65,6 @@ class PHOTO{
     const float Ki = 0;
     const float Kd = 0;
 
-    volatile static int counter;
-    volatile static unsigned long lastPulseTime;
-    volatile static unsigned long pulseInterval;
-    volatile uint16_t rpm; // RPMの変数 uint16_t:65535rpmまで計測可能
-    static void Measure(); //digitalPinToInterruptの引数で読み込むために静的メンバ関数として定義
 
     float nowRPM;// =0
     float beforeRPM;//=0
@@ -80,4 +78,5 @@ class PHOTO{
     int stock_rpm_num;//=0
 
 };
+
 #endif

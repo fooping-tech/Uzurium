@@ -1,9 +1,10 @@
 #include "PHOTO.h"
 
-volatile unsigned long PHOTO::lastPulseTime=1;
 volatile int PHOTO::counter=0;
+volatile unsigned long PHOTO::lastPulseTime=1;
 volatile unsigned long PHOTO::pulseInterval=100000000;//最大値に設定
-//volatile uint16_t rpm=0;
+volatile uint16_t PHOTO::rpm=0;
+int PHOTO::photo_pin=19;
 
 PHOTO::PHOTO()
   : _OffsetDutyInitValue(0)
@@ -14,7 +15,7 @@ PHOTO::PHOTO()
   , _MIN_DUTY(0)
   , _M_DUTY(0)
 {
-    photo_pin=0;
+    //photo_pin=0;
     outRPM =6000 ;//脱調RPM
     inRPM=0;//回転開始RPM
     outDuty=0;//脱調DUTY=0
@@ -26,7 +27,7 @@ PHOTO::PHOTO()
 
     //lastPulseTime=1;
     //pulseInterval=100000000;//最大値に設定
-    rpm =0 ; // RPMの変数 uint16_t:65535rpmまで計測可能 =0
+    //rpm =0 ; // RPMの変数 uint16_t:65535rpmまで計測可能 =0
 
     nowRPM=0;// =0
     beforeRPM=0;//=0
@@ -42,12 +43,9 @@ PHOTO::PHOTO()
 }
 
 void PHOTO::setup(int pin){
-  Serial.println("PHOTO setup start.");
   photo_pin = pin;
   pinMode(pin,INPUT);
-  Serial.println("PHOTO setup pin set ok.");
   SetInterrupt();
-  Serial.println("PHOTO setup interrupt set ok.");
   //lastmillis = millis(); // タイムアウトのための時間変数を初期化
   SetOffsetDuty(_OffsetDutyInitValue);//offsetを初期値にセット
   Serial.println("PHOTO setup was completed.");
@@ -78,8 +76,24 @@ void PHOTO::StopInterrupt(){
 void PHOTO::SetInterrupt(){
  attachInterrupt(digitalPinToInterrupt(photo_pin), PHOTO::Measure, FALLING);
 }
+void PHOTO::Measure(){
+  //StopInterrupt();
+  unsigned long cur = micros();
+  unsigned long dif = cur - lastPulseTime; // 前回のエッジとの差分
+  pulseInterval = (pulseInterval - (pulseInterval >> 2)) + (dif >> 2); // 滑らかに
+  lastPulseTime = cur;
+  rpm = 60000000 / (pulseInterval);
+  //pmcount++;
+  //MODE_C_CountUp();
+  counter++;
+//  Serial.println(counter);
+  //SetInterrupt();
+}
+int PHOTO::CheckCounter(){
+  return counter;
+}
 void PHOTO::CalcRPM(){
-rpm = 60000000 / (pulseInterval);
+  rpm = 60000000 / (pulseInterval);
 }
 void PHOTO::SetTargetRPM(float target){
 TargetRPM = target;
@@ -123,21 +137,11 @@ void PHOTO::DeleteNowRPMStock(){
     stock_rpm[i]=0;
   }
 }
-void PHOTO::Measure(){
-unsigned long cur = micros();
-  unsigned long dif = cur - lastPulseTime; // 前回のエッジとの差分
-  pulseInterval = (pulseInterval - (pulseInterval >> 2)) + (dif >> 2); // 滑らかに
-  lastPulseTime = cur;
-  //pmcount++;
-  //MODE_C_CountUp();
-  counter++;
-}
-int PHOTO::CheckCounter(){
-  return counter;
-}
+
+
 bool PHOTO::CheckTimeout(){
-  if(micros() - lastPulseTime > 100000){
-    //TRACE();
+  if(micros() - lastPulseTime > 500000){
+    Serial.println("Photo_TimeOut!");
     rpm = 0;
     pulseInterval=100000000;
     inFlag=false;
@@ -210,4 +214,7 @@ void PHOTO::IncreaseDuty(int d){
 void PHOTO::DecreaseDuty(int d){
   duty-=d;
   if(duty<=_MIN_DUTY)duty=_MIN_DUTY;
+}
+void PHOTO::SetKp(float k){
+  Kp = k;
 }

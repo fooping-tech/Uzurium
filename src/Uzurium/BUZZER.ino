@@ -1,4 +1,4 @@
-const int BUZZER_TaskSpan = 10; // タスク実行間隔(ms)
+/*const int BUZZER_TaskSpan = 10; // タスク実行間隔(ms)
 
 uint32_t BUZZER_startTime = 0;//経過時間
 uint32_t BUZZER_cycleTime = 0;//サイクルタイム
@@ -89,4 +89,4 @@ void BUZZER_main(){
   }
 }
 
-
+*/

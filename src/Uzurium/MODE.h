@@ -54,25 +54,6 @@ class MODE{
     int _brightness=0;
 };
 
-/*
-class BuzzerMode : public MODE {
-public:
-    BuzzerMode(int m) : MODE() {
-     Serial.println("<----BuzzerMode_begin---->");
-     active=true;
-     seq=m;
-    }
-    // main関数をオーバーライド
-    void main() override {
-        motor->move(10);
-        led->counter(photo->CheckCounter());
-    }
-
-    private:
-        int seq=0;
-        
-};
-*/
 class ADinputMode : public MODE {
 public:
     ADinputMode(PHOTO *p,DCMPWM *m,RINGLED *l) : MODE(p,m,l) {
@@ -80,6 +61,7 @@ public:
      photo = p;
      motor = m;
      led = l;
+     led->setbrightness(25);
      active=true;
      name="ADinputMode";
      _InitMode=2;
@@ -128,6 +110,7 @@ public:
      photo = p;
      motor = m;
      led = l;
+     led->setbrightness(25);
      active=false;
      name="StopMode";
      _InitMode=0;//初期化時のブザーモード
@@ -151,6 +134,7 @@ public:
      photo = p;
      motor = m;
      led = l;
+     led->setbrightness(25);
      active=true;
      startTime = millis();
      _InitMode=1;
@@ -213,6 +197,31 @@ public:
 
 };
 
+//=========Inspection Functions============
+
+class ADInspectionMode : public MODE {
+public:
+    ADInspectionMode(PHOTO *p,DCMPWM *m,RINGLED *l) : MODE(p,m,l) {
+     Serial.println("<----ADInspectionMode_begin---->");
+     photo = p;
+     motor = m;
+     led = l;
+     led->setbrightness(10);
+     active=true;
+     _InitMode=5;
+     name="ADInspectionMode";
+    }
+    // main関数をオーバーライド
+    void main() override {
+        motor->move(0);
+        int value = map(adv,0,4095,1,18);
+        led->level(value);
+    }
+
+    private:
+
+};
+
 class PhotoReflectorInspectionMode : public MODE {
 public:
     PhotoReflectorInspectionMode(PHOTO *p,DCMPWM *m,RINGLED *l) : MODE(p,m,l) {
@@ -220,6 +229,7 @@ public:
      photo = p;
      motor = m;
      led = l;
+     led->setbrightness(10);
      active=true;
      _InitMode=3;
      name="PhotoReflectorInspectionMode";
@@ -241,7 +251,9 @@ public:
      photo = p;
      motor = m;
      led = l;
+     led->setbrightness(10);
      active=true;
+     _InitMode=4;
      name="LedInspectionMode";
     }
     // main関数をオーバーライド
@@ -270,6 +282,7 @@ public:
      photo = p;
      motor = m;
      led = l;
+     led->setbrightness(25);
      active=true;
      _InitMode=0;//初期化時のブザーモード
      name="RemoteControlMode";

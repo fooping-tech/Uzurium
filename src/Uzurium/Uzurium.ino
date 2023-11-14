@@ -12,13 +12,13 @@ enum Mode{
   MODE_C,
   MODE_D
 };
+
 Mode Uzu_mode = MODE_STOP;
 int Uzurium_Number = 0;
 
-
-
 // モードオブジェクトのポインタ
 MODE *currentMode;
+
 
 //Uzurium MODEをセットする
 void Uzurium_SetMode(Mode mode){
@@ -66,8 +66,9 @@ void setup() {
   //MOTOR INITIAL
   motor.setup(CHANNEL,MOTOR_PIN);
   //MOTOR SLEEP
-  pinMode(21, OUTPUT);
-  digitalWrite(21, HIGH);
+//  pinMode(21, OUTPUT);
+ // digitalWrite(21, HIGH);
+  pinMode(21, INPUT_PULLUP);
   //LED_INITIAL
   led.setup(LED_PIN);//led setup (led_num)
 
@@ -76,6 +77,7 @@ void setup() {
   
   //SW-INITIAL
   SW_setup();
+  //初期モードにセット
   currentMode = new StopMode(&photo,&motor,&led);
 //  currentMode = new MODE();
 
@@ -91,12 +93,6 @@ void setup() {
     ,  NULL //作成タスクのHandleへのポインタ
     ,  0);  //利用するCPUコア(0-1)
 
-  //初期モードにセット
-
-  Uzurium_SetMode(MODE_STOP);
-
-  BUZZER_On(0);
-
   led.setbrightness(LedBrightness);
 
 }
@@ -110,17 +106,6 @@ void Uzurium_Task(void *pvParameters){
 
 void Uzurium_ClapModeChange(){
   if(FFT_CheckMagnitude() > 300){
-    
-    //MODE_Aで所定時間以上動作中ならストップ
-    if(MODE_A_CheckInit() == true && MODE_A_CheckSpentTime() >= 1000){
-      TRACE();
-      Uzurium_SetMode(MODE_STOP);
-    }
-    //MODE_Aに入っていないならMODE_Aに入れる
-    if(MODE_STOP_CheckInit() == true && MODE_STOP_CheckSpentTime() >=1000){
-      TRACE();
-      Uzurium_SetMode(MODE_A);
-    }
   }
 }
 
@@ -130,15 +115,57 @@ void Uzurium_main(){
 // 現在のモードのmainloop()を呼び出す
   currentMode->mainloop();
   currentMode->GetAdValue(FFT_CheckADvalue());
-//  DUMP(currentMode->active);
+
+  //スイッチリード(モーメンタリ)
   int sw = SW_check3();
-  if(sw==1){
-    if(currentMode->active ==true){
-      delete currentMode;
-      currentMode = new StopMode(&photo,&motor,&led);
-    }else{
-      delete currentMode;
-      currentMode = new ADinputMode(&photo,&motor,&led);
+  //スイッチリード(オルタネート)
+  int sw2= digitalRead(21);
+
+  if(sw2==1){//オルタネートSW = OFF
+    if(sw==1){
+      if(currentMode->active ==true){
+        delete currentMode;
+        currentMode = new StopMode(&photo,&motor,&led);
+      }else{
+        delete currentMode;
+        currentMode = new ADinputMode(&photo,&motor,&led);
+      }
+    }
+    if(sw==2){
+      if(currentMode->active ==true){
+        delete currentMode;
+        currentMode = new StopMode(&photo,&motor,&led);
+      }else{
+        delete currentMode;
+        currentMode = new FeedBackMode(&photo,&motor,&led);
+      }
+    }
+    if(sw==3){
+        delete currentMode;
+        currentMode = new PhotoReflectorInspectionMode(&photo,&motor,&led);
+    }
+  }else{//オルタネートSW = ON
+    if(sw==1){
+      if(currentMode->active ==true){
+        delete currentMode;
+        currentMode = new StopMode(&photo,&motor,&led);
+      }else{
+        delete currentMode;
+        currentMode = new LedInspectionMode(&photo,&motor,&led);
+      }
+    }
+    if(sw==2){
+      if(currentMode->active ==true){
+        delete currentMode;
+        currentMode = new StopMode(&photo,&motor,&led);
+      }else{
+        delete currentMode;
+        currentMode = new FeedBackMode(&photo,&motor,&led);
+      }
+    }
+    if(sw==3){
+        delete currentMode;
+        currentMode = new PhotoReflectorInspectionMode(&photo,&motor,&led);
     }
   }
   /*

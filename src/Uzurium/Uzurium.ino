@@ -167,7 +167,7 @@ void Uzurium_main(){
         currentMode = new StopMode(&photo,&motor,&led);
       }else{
         delete currentMode;
-        currentMode = new RemoteControlMode(&photo,&motor,&led);
+        currentMode = new ADInspectionMode(&photo,&motor,&led);
       }
     }
     if(sw==3){

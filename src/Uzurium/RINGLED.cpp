@@ -246,7 +246,22 @@ void fadeall(){
     leds[i].nscale8(250);
   }
 }
-
+void RINGLED::inspection(int color){
+  if(color==0){
+    for(int i = 0; i < NUM_LEDS; i++) {
+      leds[i] = CRGB(0 , 0, 255);
+    }
+  }else if(color==1){
+    for(int i = 0; i < NUM_LEDS; i++) {
+      leds[i] = CRGB(0 , 255, 0);
+    }
+  }else if(color==2){
+    for(int i = 0; i < NUM_LEDS; i++) {
+      leds[i] = CRGB(255 , 0, 0);
+    }
+  }
+  FastLED.show(); 
+}
 void RINGLED::counter(int count){
   int color = 100 * count / NUM_LEDS;
   int turn = count/NUM_LEDS;

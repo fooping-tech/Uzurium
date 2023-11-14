@@ -24,6 +24,7 @@ class RINGLED{
     void fire();
     void fire2(int,int);
     void fade();
+    void inspection(int);
     void stop();
     void pacifica();
     void setbrightness(int);//brightness

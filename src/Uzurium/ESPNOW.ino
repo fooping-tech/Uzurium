@@ -96,19 +96,24 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len) {
     if(mode==0){
       switch(value1){
           case 0:
-            Uzurium_SetMode(MODE_STOP);
+            delete currentMode;
+            currentMode = new StopMode(&photo,&motor,&led);
             break;
           case 4:
-            Uzurium_SetMode(MODE_A);
+            delete currentMode;
+            currentMode = new ADinputMode(&photo,&motor,&led);
             break;
           case 2:
-            Uzurium_SetMode(MODE_B);
+            delete currentMode;
+            currentMode = new FeedBackMode(&photo,&motor,&led);
             break;
           case 3:
-            Uzurium_SetMode(MODE_C);
+            delete currentMode;
+            currentMode = new FeedBackMode(&photo,&motor,&led);
             break;
           case 1:
-            Uzurium_SetMode(MODE_D);
+            delete currentMode;
+            currentMode = new RemoteControlMode(&photo,&motor,&led);
             break;
         }
     }

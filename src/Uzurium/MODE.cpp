@@ -86,6 +86,38 @@ void MODE::InitFunction(){
       _InitCondition =true;
     }
   }
+  if(_InitMode==4){
+    if(spentTime>0){
+      motor->changeFreq(12);
+    }
+    if(spentTime>100)motor->move(0);
+    if(spentTime>200){
+      motor->move(10);
+      motor->changeFreq(10);
+    }
+    if(spentTime>300){
+      motor->changeFreq(11);
+    }
+    if(spentTime>400){
+      motor->changeFreq(8);
+    }
+    if(spentTime>500){
+      motor->move(0);
+      _InitCondition =true;
+    }
+  }
+  if(_InitMode==5){
+    if(spentTime>0)motor->changeFreq(12);
+    if(spentTime>100)motor->changeFreq(8);
+    if(spentTime>200)motor->changeFreq(12);
+    if(spentTime>300)motor->changeFreq(8);
+    if(spentTime>400)motor->changeFreq(12);
+    if(spentTime>500)motor->changeFreq(8);
+    if(spentTime>600){
+      motor->move(0);
+      _InitCondition =true;
+    }
+  }
 }
 void MODE::main(){
       

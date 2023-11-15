@@ -41,6 +41,9 @@ Adafruit_INA219 ina219;
 
 //SW
 #define SW_PIN 25
+//SW
+#define TEST_SW_PIN 21
+
 //PID定数
 float Kp = 0.0007;
 const float Ki = 0;

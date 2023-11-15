@@ -1,3 +1,18 @@
+int cur_value_sw = 0;
+int last_value_sw = 0;
+bool sw_val = false;
+
+bool BUTTON_check_sw(){
+  
+  cur_value_sw = digitalRead(TEST_SW_PIN);
+  if(cur_value_sw != last_value_sw){  //前回値と今回値が異なり
+    sw_val = true;
+  }else sw_val = false;
+
+  last_value_sw = cur_value_sw;       //前回値を更新
+  if(sw_val)return true;
+  else return false;
+}
 /*
 #define TopButton 1
 #define RedButton 2

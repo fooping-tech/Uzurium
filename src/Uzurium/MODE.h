@@ -13,7 +13,7 @@ class MODE{
       startTime = millis();
       cycleTime = millis();
       adv=0;
-      active=false;
+      active=true;
       name="";
       photo = p;
       motor = m;
@@ -46,6 +46,7 @@ class MODE{
     bool _InitCondition=false;
     int _InitCounter=0;
     int _InitMode=0;
+    int _value=0;
     DCMPWM *motor;
     PHOTO *photo;
     RINGLED *led;
@@ -62,9 +63,9 @@ public:
      motor = m;
      led = l;
      led->setbrightness(25);
-     active=true;
      name="ADinputMode";
      _InitMode=2;
+     _value=100;//ボタン選択時の色
     }
   
     // main関数をオーバーライド
@@ -84,14 +85,16 @@ public:
       //DUTYに応じてLEDのhueを可変
       led->fire2(4,photo->CheckDuty()+100);
 
-      //Serial.print(spentTime);
-      //Serial.print(",");
+      Serial.print("RPM:");
       Serial.print(photo->CheckRpm());
       Serial.print(",");
+      Serial.print("nowRPM:");
       Serial.print(photo->CheckNowRPM());
       Serial.print(",");
+      Serial.print("TargetRPM:");
       Serial.print(photo->CheckTargetRPM());
       Serial.print(",");
+      Serial.print("DUTY:");
       Serial.println(photo->CheckDuty());
 
     }
@@ -111,17 +114,38 @@ public:
      motor = m;
      led = l;
      led->setbrightness(25);
-     active=false;
      name="StopMode";
      _InitMode=0;//初期化時のブザーモード
+    _value=150;//ボタン選択時の色
+
     }
     // main関数をオーバーライド
     void main() override {
         motor->move(0);
         //DUTYに応じてLEDのhueを可変
         led->pacifica();
-//      }
+    }
 
+    private:
+  };
+
+class TestMode : public MODE {
+public:
+    TestMode(PHOTO *p,DCMPWM *m,RINGLED *l) : MODE(p,m,l) {
+     Serial.println("<----TestMode_begin---->");
+     photo = p;
+     motor = m;
+     led = l;
+     led->setbrightness(25);
+     name="TestMode";
+     _InitMode=6;//初期化時のブザーモード
+    _value=150;//ボタン選択時の色
+    }
+    // main関数をオーバーライド
+    void main() override {
+        motor->move(0);
+        //DUTYに応じてLEDのhueを可変
+        led->flash(50);
     }
 
     private:
@@ -135,22 +159,18 @@ public:
      motor = m;
      led = l;
      led->setbrightness(25);
-     active=true;
      startTime = millis();
      _InitMode=1;
      TaskSpan=10;
      name="FeedBackMode";
+    _value=200;//ボタン選択時の色
     }
     // main関数をオーバーライド
     void main() override {
 //RPMを計測する
       photo->CalcNowRPM();
-      //シリアル通信のデータを書き出す
-      //SERIAL_SetSerialData();
       //エッジがしばらく来ない場合にRPM初期化
       photo->CheckTimeout();
-      //BUZZERを鳴らしていない時
-//      if(!BUZZER_CheckInit()){
          //PID制御によりDUTYを計算する
         photo->ClacDuty(deltaTime);
         //算出したDUTYでモータを回す
@@ -160,17 +180,19 @@ public:
 //      }
       //Kpをポテンショで可変
       float Kp = map(adv,0,4095,0,1000) * 0.000001;
-//      Serial.print("Kp=");
-//      Serial.println(Kp,8);
+
       photo->SetKp(Kp);
 
-
+      Serial.print("RPM:");
       Serial.print(photo->CheckRpm());
       Serial.print(",");
+      Serial.print("nowRPM:");
       Serial.print(photo->CheckNowRPM());
       Serial.print(",");
+      Serial.print("TargetRPM:");
       Serial.print(photo->CheckTargetRPM());
       Serial.print(",");
+      Serial.print("DUTY:");
       Serial.println(photo->CheckDuty());
 
       //脱調判定
@@ -186,6 +208,7 @@ public:
       if(spentTime>35000)photo->SetTargetRPM(2500);
       if(spentTime>40000)photo->SetTargetRPM(1500);
       if(spentTime>45000)photo->SetTargetRPM(0);
+      if(spentTime>50000)active=false;
 
       //脱調していたら
       if(photo->CheckOutFlag()){
@@ -207,9 +230,10 @@ public:
      motor = m;
      led = l;
      led->setbrightness(10);
-     active=true;
      _InitMode=5;
      name="ADInspectionMode";
+    _value=210;//ボタン選択時の色
+
     }
     // main関数をオーバーライド
     void main() override {
@@ -230,9 +254,10 @@ public:
      motor = m;
      led = l;
      led->setbrightness(10);
-     active=true;
      _InitMode=3;
      name="PhotoReflectorInspectionMode";
+    _value=220;//ボタン選択時の色
+
     }
     // main関数をオーバーライド
     void main() override {
@@ -252,9 +277,10 @@ public:
      motor = m;
      led = l;
      led->setbrightness(10);
-     active=true;
      _InitMode=4;
      name="LedInspectionMode";
+    _value=230;//ボタン選択時の色
+
     }
     // main関数をオーバーライド
     void main() override {
@@ -269,6 +295,7 @@ public:
         if(16000>=spentTime && spentTime>14000)led->inspection(0);
         if(18000>=spentTime && spentTime>16000)led->inspection(1);
         if(spentTime>18000)led->inspection(2);
+        if(spentTime>20000)active=false;
     }
 
     private:
@@ -283,9 +310,10 @@ public:
      motor = m;
      led = l;
      led->setbrightness(25);
-     active=true;
      _InitMode=0;//初期化時のブザーモード
      name="RemoteControlMode";
+    _value=250;//ボタン選択時の色
+
     }
     // main関数をオーバーライド
     void main() override {

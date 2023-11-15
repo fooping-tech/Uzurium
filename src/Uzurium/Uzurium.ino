@@ -118,19 +118,39 @@ void Uzurium_main(){
 // 現在のモードのmainloop()を呼び出す
   currentMode->mainloop();
   currentMode->SetAdValue(FFT_CheckADvalue());
+
+  //現在の実行モードが非アクティブになった場合はStopModeへ入れる
+  if(currentMode->active==false){
+    delete currentMode;
+    currentMode = new StopMode(&photo,&motor,&led);
+  }
   //所定モードの時のみ実行
   if(currentMode->name=="RemoteControlMode"){
     currentMode->SetParams(ESPNOW_CheckDuty(),ESPNOW_CheckHue(),ESPNOW_CheckBrightness());
-    Uzurium_Number = VR_CheckValue();
   }
+  if(currentMode->name=="ADInspectionMode"){
+        Uzurium_Number = VR_CheckValue();
+  }
+
   //スイッチリード(モーメンタリ)
   int sw = SW_check3();
   //スイッチリード(オルタネート)
-  int sw2= digitalRead(21);
+  int sw2= digitalRead(TEST_SW_PIN);
+
+  if(BUTTON_check_sw()){
+      if(sw2==0){
+        delete currentMode;
+        currentMode = new TestMode(&photo,&motor,&led);
+      }
+      else{
+        delete currentMode;
+        currentMode = new StopMode(&photo,&motor,&led);
+      }
+  }
 
   if(sw2==1){//オルタネートSW = OFF
     if(sw==1){
-      if(currentMode->active ==true){
+      if(currentMode->name != "StopMode"){
         delete currentMode;
         currentMode = new StopMode(&photo,&motor,&led);
       }else{
@@ -139,13 +159,8 @@ void Uzurium_main(){
       }
     }
     if(sw==2){
-      if(currentMode->active ==true){
-        delete currentMode;
-        currentMode = new StopMode(&photo,&motor,&led);
-      }else{
         delete currentMode;
         currentMode = new FeedBackMode(&photo,&motor,&led);
-      }
     }
     if(sw==3){
         delete currentMode;
@@ -153,26 +168,22 @@ void Uzurium_main(){
     }
   }else{//オルタネートSW = ON
     if(sw==1){
-      if(currentMode->active ==true){
+      if(currentMode->name != "TestMode"){
         delete currentMode;
-        currentMode = new StopMode(&photo,&motor,&led);
-      }else{
-        delete currentMode;
-        currentMode = new LedInspectionMode(&photo,&motor,&led);
-      }
-    }
-    if(sw==2){
-      if(currentMode->active ==true){
-        delete currentMode;
-        currentMode = new StopMode(&photo,&motor,&led);
+        currentMode = new TestMode(&photo,&motor,&led);
       }else{
         delete currentMode;
         currentMode = new ADInspectionMode(&photo,&motor,&led);
       }
     }
-    if(sw==3){
+    if(sw==2){
         delete currentMode;
         currentMode = new PhotoReflectorInspectionMode(&photo,&motor,&led);
+    }
+    if(sw==3){
+        delete currentMode;
+        currentMode = new LedInspectionMode(&photo,&motor,&led);
+      
     }
   }
   /*

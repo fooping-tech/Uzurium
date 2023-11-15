@@ -23,9 +23,11 @@ void MODE::mainloop(){
 }
 
 void MODE::InitFunction(){
+  //
   motor->move(10);
-  led->counter(_InitCounter);
-  _InitCounter++;
+  led->flash(_value);
+//  led->counter(_InitCounter);
+//  _InitCounter++;
   if(_InitMode==0){
     if(spentTime>0)motor->changeFreq(8);
     if(spentTime>100)motor->changeFreq(12);
@@ -112,6 +114,18 @@ void MODE::InitFunction(){
     if(spentTime>200)motor->changeFreq(12);
     if(spentTime>300)motor->changeFreq(8);
     if(spentTime>400)motor->changeFreq(12);
+    if(spentTime>500)motor->changeFreq(8);
+    if(spentTime>600){
+      motor->move(0);
+      _InitCondition =true;
+    }
+  }
+  if(_InitMode==6){
+    if(spentTime>0)motor->changeFreq(12);
+    if(spentTime>100)motor->changeFreq(13);
+    if(spentTime>200)motor->changeFreq(11);
+    if(spentTime>300)motor->changeFreq(10);
+    if(spentTime>400)motor->changeFreq(9);
     if(spentTime>500)motor->changeFreq(8);
     if(spentTime>600){
       motor->move(0);

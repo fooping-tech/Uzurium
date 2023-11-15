@@ -321,7 +321,7 @@ void RINGLED::fire(){
 void RINGLED::flash(int led_color){
   for(int i=0;i<NUM_LEDS;i++){
       leds[i] = CHSV(led_color, 255, 255);
-      led_color = 100;
+      //led_color = 100;
       led_color = constrain(led_color,0,255);
       if(led_color>=255)led_color=0;
     }

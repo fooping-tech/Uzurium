@@ -4,7 +4,7 @@ int last_value = 0;
 unsigned long lastDebounceTime = 0; // 最後にボタンが押された時間
 unsigned long debounceDelay = 50;   // デバウンス用の遅延時間（ミリ秒）
 bool buttonLongPressed = false; // ボタンが長押し状態かどうかを示すフラグ
-unsigned long longPressDuration = 1000; // 長押しとみなす時間（ミリ秒）
+unsigned long longPressDuration = 700; // 長押しとみなす時間（ミリ秒）
 
 int lastClickTime = 0; // 最後のクリック時間
 int doubleClickDelay = 300; // ダブルクリックとみなす時間間隔（ミリ秒）

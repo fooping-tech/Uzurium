@@ -10,6 +10,7 @@
 #include "RINGLED.h"
 #include "PHOTO.h"
 #include "MODE.h"
+#include "SW.h"
 
 #include <esp_now.h>
 #include <WiFi.h>
@@ -43,6 +44,8 @@ Adafruit_INA219 ina219;
 #define SW_PIN 25
 //SW
 #define TEST_SW_PIN 21
+//SW
+#define BTN_SW_PIN 39
 
 //PID定数
 float Kp = 0.0007;

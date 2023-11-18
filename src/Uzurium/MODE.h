@@ -53,12 +53,13 @@ class MODE{
     int _duty=0;
     int _hue=0;
     int _brightness=0;
+    int _MaxDuty=100;
 };
 
 class ADinputMode : public MODE {
 public:
     ADinputMode(PHOTO *p,DCMPWM *m,RINGLED *l) : MODE(p,m,l) {
-     Serial.println("<----ADinputMode_begin---->");
+
      photo = p;
      motor = m;
      led = l;
@@ -66,6 +67,9 @@ public:
      name="ADinputMode";
      _InitMode=2;
      _value=100;//ボタン選択時の色
+     Serial.print("<----");
+     Serial.print(name);
+     Serial.println("_begin---->");
     }
   
     // main関数をオーバーライド
@@ -78,7 +82,7 @@ public:
       //PID制御によりDUTYを計算する
       photo->ClacDuty(deltaTime);
       //ポテンショ対応;DUTYを上書き
-      int duty = map(adv,0,4095,0,200);
+      int duty = map(adv,0,4095,0,_MaxDuty);
       photo->SetDuty(duty);
       motor->move(photo->CheckDuty());
       //motor->move(duty);
@@ -104,12 +108,13 @@ public:
       PHOTO *photo;
       RINGLED *led;
       
+      
         
   };
 class StopMode : public MODE {
 public:
     StopMode(PHOTO *p,DCMPWM *m,RINGLED *l) : MODE(p,m,l) {
-     Serial.println("<----StopMode_begin---->");
+
      photo = p;
      motor = m;
      led = l;
@@ -117,7 +122,9 @@ public:
      name="StopMode";
      _InitMode=0;//初期化時のブザーモード
     _value=150;//ボタン選択時の色
-
+     Serial.print("<----");
+     Serial.print(name);
+     Serial.println("_begin---->");
     }
     // main関数をオーバーライド
     void main() override {
@@ -132,7 +139,7 @@ public:
 class TestMode : public MODE {
 public:
     TestMode(PHOTO *p,DCMPWM *m,RINGLED *l) : MODE(p,m,l) {
-     Serial.println("<----TestMode_begin---->");
+
      photo = p;
      motor = m;
      led = l;
@@ -140,6 +147,9 @@ public:
      name="TestMode";
      _InitMode=6;//初期化時のブザーモード
     _value=150;//ボタン選択時の色
+     Serial.print("<----");
+     Serial.print(name);
+     Serial.println("_begin---->");
     }
     // main関数をオーバーライド
     void main() override {
@@ -154,7 +164,7 @@ public:
 class FeedBackMode : public MODE {
 public:
     FeedBackMode(PHOTO *p,DCMPWM *m,RINGLED *l) : MODE(p,m,l) {
-     Serial.println("<----FeedBackMode_begin---->");
+
      photo = p;
      motor = m;
      led = l;
@@ -164,6 +174,9 @@ public:
      TaskSpan=10;
      name="FeedBackMode";
     _value=200;//ボタン選択時の色
+     Serial.print("<----");
+     Serial.print(name);
+     Serial.println("_begin---->");
     }
     // main関数をオーバーライド
     void main() override {
@@ -225,7 +238,7 @@ public:
 class ADInspectionMode : public MODE {
 public:
     ADInspectionMode(PHOTO *p,DCMPWM *m,RINGLED *l) : MODE(p,m,l) {
-     Serial.println("<----ADInspectionMode_begin---->");
+
      photo = p;
      motor = m;
      led = l;
@@ -233,7 +246,9 @@ public:
      _InitMode=5;
      name="ADInspectionMode";
     _value=210;//ボタン選択時の色
-
+     Serial.print("<----");
+     Serial.print(name);
+     Serial.println("_begin---->");
     }
     // main関数をオーバーライド
     void main() override {
@@ -249,7 +264,7 @@ public:
 class PhotoReflectorInspectionMode : public MODE {
 public:
     PhotoReflectorInspectionMode(PHOTO *p,DCMPWM *m,RINGLED *l) : MODE(p,m,l) {
-     Serial.println("<----PhotoReflectorInspectionMode_begin---->");
+
      photo = p;
      motor = m;
      led = l;
@@ -257,7 +272,9 @@ public:
      _InitMode=3;
      name="PhotoReflectorInspectionMode";
     _value=220;//ボタン選択時の色
-
+     Serial.print("<----");
+     Serial.print(name);
+     Serial.println("_begin---->");
     }
     // main関数をオーバーライド
     void main() override {
@@ -272,7 +289,7 @@ public:
 class LedInspectionMode : public MODE {
 public:
     LedInspectionMode(PHOTO *p,DCMPWM *m,RINGLED *l) : MODE(p,m,l) {
-     Serial.println("<----LedInspectionMode_begin---->");
+
      photo = p;
      motor = m;
      led = l;
@@ -280,7 +297,9 @@ public:
      _InitMode=4;
      name="LedInspectionMode";
     _value=230;//ボタン選択時の色
-
+     Serial.print("<----");
+     Serial.print(name);
+     Serial.println("_begin---->");
     }
     // main関数をオーバーライド
     void main() override {
@@ -305,7 +324,7 @@ public:
 class RemoteControlMode : public MODE {
 public:
     RemoteControlMode(PHOTO *p,DCMPWM *m,RINGLED *l) : MODE(p,m,l) {
-     Serial.println("<----RemoteControlMode_begin---->");
+
      photo = p;
      motor = m;
      led = l;
@@ -313,7 +332,9 @@ public:
      _InitMode=0;//初期化時のブザーモード
      name="RemoteControlMode";
     _value=250;//ボタン選択時の色
-
+     Serial.print("<----");
+     Serial.print(name);
+     Serial.println("_begin---->");
     }
     // main関数をオーバーライド
     void main() override {
@@ -325,4 +346,47 @@ public:
   private:
 
   };
+
+class TimerMode : public MODE {
+  public:
+    TimerMode(PHOTO *p,DCMPWM *m,RINGLED *l) : MODE(p,m,l) {
+     photo = p;
+     motor = m;
+     led = l;
+     led->setbrightness(25);
+     _InitMode=0;//初期化時のブザーモード
+     name="TimerMode";
+    _value=250;//ボタン選択時の色
+    _time=60 * 1000;//タイマー設定
+     Serial.print("<----");
+     Serial.print(name);
+     Serial.println("_begin---->");
+
+    }
+    // main関数をオーバーライド
+    void main() override {
+      int max_duty = map(adv,0,4095,0,_MaxDuty);
+      int duty = 0;
+      if(spentTime>_time*0)duty= max_duty *0.3;
+      if(spentTime>_time*0.2)duty= max_duty *0.4;
+      if(spentTime>_time*0.3)duty= max_duty *0.5;
+      if(spentTime>_time*0.4)duty= max_duty *0.6;
+      if(spentTime>_time*0.5)duty= max_duty *0.7;
+      if(spentTime>_time*0.6)duty= max_duty *0.8;
+      if(spentTime>_time*0.7)duty= max_duty *0.9;
+      if(spentTime>_time*0.8)duty= max_duty *0.9;
+      if(spentTime>_time*0.9)duty= max_duty *1.0;
+      if(spentTime>_time*1.0){
+        duty = 0;
+        active=false;
+      }
+      photo->SetDuty(duty);
+      motor->move(photo->CheckDuty());
+
+
+    }
+  private:
+   int _time; //timer
+
+};
 #endif

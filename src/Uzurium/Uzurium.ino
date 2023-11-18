@@ -3,6 +3,9 @@
 DCMPWM motor = DCMPWM();
 RINGLED led = RINGLED();
 PHOTO photo = PHOTO();
+SW switch1 = SW(SW_PIN,INPUT);
+SW switch2 = SW(TEST_SW_PIN,INPUT_PULLUP);
+//SW switch3 = SW(BTN_SW_PIN,INPUT);
 
 //モード定義
 enum Mode{
@@ -71,7 +74,7 @@ void setup() {
   //MOTOR SLEEP
 //  pinMode(21, OUTPUT);
  // digitalWrite(21, HIGH);
-  pinMode(21, INPUT_PULLUP);
+  //pinMode(TEST_SW_PIN, INPUT_PULLUP);
   //LED_INITIAL
   led.setup(LED_PIN);//led setup (led_num)
 
@@ -79,7 +82,7 @@ void setup() {
   ESPNOW_setup();
   
   //SW-INITIAL
-  SW_setup();
+  //SW_setup();
   //初期モードにセット
   currentMode = new StopMode(&photo,&motor,&led);
 //  currentMode = new MODE();
@@ -112,32 +115,18 @@ void Uzurium_ClapModeChange(){
   }
 }
 
-void Uzurium_main(){
-
-  
-// 現在のモードのmainloop()を呼び出す
-  currentMode->mainloop();
-  currentMode->SetAdValue(FFT_CheckADvalue());
-
-  //現在の実行モードが非アクティブになった場合はStopModeへ入れる
-  if(currentMode->active==false){
-    delete currentMode;
-    currentMode = new StopMode(&photo,&motor,&led);
-  }
-  //所定モードの時のみ実行
-  if(currentMode->name=="RemoteControlMode"){
-    currentMode->SetParams(ESPNOW_CheckDuty(),ESPNOW_CheckHue(),ESPNOW_CheckBrightness());
-  }
-  if(currentMode->name=="ADInspectionMode"){
-        Uzurium_Number = VR_CheckValue();
-  }
-
+void checkSW(){
   //スイッチリード(モーメンタリ)
-  int sw = SW_check3();
+  int sw = switch1.check_m();
+  //int sw3 = switch3.check_m();
+  
   //スイッチリード(オルタネート)
-  int sw2= digitalRead(TEST_SW_PIN);
+  int sw2= switch2.check_a();
+  //前回値からの変更有無
+  bool sw2st = switch2.check_change();
 
-  if(BUTTON_check_sw()){
+  //TEST_SWが前回値から変更されていたらsw2の論理にあわせたモードへ変更
+  if(sw2st){
       if(sw2==0){
         delete currentMode;
         currentMode = new TestMode(&photo,&motor,&led);
@@ -164,8 +153,23 @@ void Uzurium_main(){
     }
     if(sw==3){
         delete currentMode;
-        currentMode = new PhotoReflectorInspectionMode(&photo,&motor,&led);
+        currentMode = new TimerMode(&photo,&motor,&led);
     }
+    if(M5.BtnA.wasPressed()){
+        if(currentMode->name=="StopMode"){
+          delete currentMode;
+          currentMode = new ADinputMode(&photo,&motor,&led);
+        }else 
+        if(currentMode->name=="ADinputMode"){
+          delete currentMode;
+          currentMode = new FeedBackMode(&photo,&motor,&led);
+        }else 
+        if(currentMode->name=="FeedBackMode"){
+          delete currentMode;
+          currentMode = new StopMode(&photo,&motor,&led);
+        }
+    }
+ 
   }else{//オルタネートSW = ON
     if(sw==1){
       if(currentMode->name != "TestMode"){
@@ -185,102 +189,43 @@ void Uzurium_main(){
         currentMode = new LedInspectionMode(&photo,&motor,&led);
       
     }
-  }
-  /*
-  //SW
-  int sw = SW_check3();
-  if(sw==2){
-    
-    bool mode_active=false;
-    if(MODE_A_CheckInit() == true && MODE_A_CheckSpentTime() >= 100)mode_active=true;
-    if(MODE_B_CheckInit() == true && MODE_B_CheckSpentTime() >= 100)mode_active=true;
-    if(MODE_C_CheckInit() == true && MODE_C_CheckSpentTime() >= 100)mode_active=true;
-    if(MODE_D_CheckInit() == true && MODE_D_CheckSpentTime() >= 100)mode_active=true;
-    if(mode_active){
-      Uzurium_SetMode(MODE_STOP);
-      BUZZER_On(1);
-      TRACE();
-    }else{
-      Uzurium_SetMode(MODE_A);
-      BUZZER_On(0);
-
-      TRACE();
+      if(M5.BtnA.wasPressed()){
+        if(currentMode->name=="TestMode"){
+          delete currentMode;
+          currentMode = new ADInspectionMode(&photo,&motor,&led);
+        }else 
+        if(currentMode->name=="ADInspectionMode"){
+          delete currentMode;
+          currentMode = new PhotoReflectorInspectionMode(&photo,&motor,&led);
+        }else 
+        if(currentMode->name=="PhotoReflectorInspectionMode"){
+          delete currentMode;
+          currentMode = new TestMode(&photo,&motor,&led);
+        }
     }
-  }else if(sw==1){
-    bool mode_active=false;
+  }
+}
 
-    if(MODE_A_CheckInit() == true && MODE_A_CheckSpentTime() >= 100)mode_active=true;
-    if(MODE_B_CheckInit() == true && MODE_B_CheckSpentTime() >= 100)mode_active=true;
-    if(MODE_C_CheckInit() == true && MODE_C_CheckSpentTime() >= 100)mode_active=true;
-    if(MODE_D_CheckInit() == true && MODE_D_CheckSpentTime() >= 100)mode_active=true;
-    
-    if(mode_active){
-      Uzurium_SetMode(MODE_STOP);
-      BUZZER_On(1);
-    }else{
-      DUMP("MODE_B");
-      Uzurium_SetMode(MODE_B);
-      BUZZER_On(0);
-      
-    }
-  }else if(sw==3){
-      DUMP("MODE_C");
-      Uzurium_SetMode(MODE_C);
+void Uzurium_main(){
+
+  
+// 現在のモードのmainloop()を呼び出す
+  currentMode->mainloop();
+  currentMode->SetAdValue(FFT_CheckADvalue());
+
+  //現在の実行モードが非アクティブになった場合はStopModeへ入れる
+  if(currentMode->active==false){
+    delete currentMode;
+    currentMode = new StopMode(&photo,&motor,&led);
+  }
+  //所定モードの時のみ実行
+  if(currentMode->name=="RemoteControlMode"){
+    currentMode->SetParams(ESPNOW_CheckDuty(),ESPNOW_CheckHue(),ESPNOW_CheckBrightness());
+  }
+  if(currentMode->name=="ADInspectionMode"){
+        Uzurium_Number = VR_CheckValue();
   }
 
-
-    //モードチェック
-  Mode mode = Uzurium_CheckState();
-  //MODE_STOP
-  if(mode == MODE_STOP){
-    //MODE_A_Finish();
-    MODE_STOP_main();
-    //led.fade(); // LED Fade OFF
-    //SPEED_SetDuty(0); // SPEED set 0;
-  }
-
-  //MODE_A
-  if(mode == MODE_A){
-    MODE_A_main();
-    
-    //int mag = FFT_CheckMagnitude();
-    //int hue = map(mag,0,256,0,256);
-    //led.fire2(4,hue);
-    
-
-    //StopDuty();
-    //led.setbrightness(50);
-  }
-  //MODE_B
-  if(mode == MODE_B){
-    MODE_B_main();
-    int mag = FFT_CheckMagnitude();
-    int hue = map(mag,0,256,0,256);
-//    led.fire2(4,hue);
-    
-
-    //FFT_main();
-    //led.fire2(4,SPEED_CheckDuty());// mode ,duty
-    //int brightness = map(SPEED_CheckDuty(),0,256,25,75);
-    //led.setbrightness(brightness);
-  }
-  //MODE_C
-  if(mode == MODE_C){
-    MODE_C_main();
-  }
-  //MODE_D
-  if(mode == MODE_D){
-    MODE_D_main();    
-  }
-
-  //シリアル入力チェック
-  SERIAL_InputCheck();
-  //
-  //Uzurium_ClapModeChange();
-  //buzzer
-  BUZZER_main();
-  VR_main();
-  */
 }
 
 void loop() {
@@ -288,6 +233,7 @@ void loop() {
   M5.update();
   //Uzurium_main();
   FFT_main();
+  checkSW();
   //uint32_t deltaTime = millis() - cycleTime;
   //uint32_t spentTime = millis() - startTime;
 

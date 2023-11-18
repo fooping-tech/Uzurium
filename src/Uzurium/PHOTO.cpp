@@ -11,7 +11,7 @@ PHOTO::PHOTO()
   , _LimitRPMD(800)
   , _StartRPMD(10)
   , _LowRPM(100)
-  , _MAX_DUTY(100)
+  , _MAX_DUTY(100) //0-256
   , _MIN_DUTY(0)
   , _M_DUTY(0)
 {

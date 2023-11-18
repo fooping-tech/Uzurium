@@ -3,7 +3,7 @@
 
 #include <M5Unified.h>
 
-#define STOCK_RPMS 15
+#define STOCK_RPMS 5
 
 class PHOTO{
   static volatile int counter;
@@ -46,7 +46,7 @@ class PHOTO{
     const int _LimitRPMD; //脱調判定回転数変化= 800
     const int _StartRPMD;//回転開始回転数変化 = 10
     const int _LowRPM; //低回転判定閾値 = 100
-    const int _MAX_DUTY; //0~256 =100
+    const int _MAX_DUTY; //0~256
     const int _MIN_DUTY; //0~256 =0
     const int _M_DUTY; //回転開始DUTYマージン = 0
 

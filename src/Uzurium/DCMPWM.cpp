@@ -21,11 +21,12 @@ void DCMPWM::setup(int CH,int PIN){
     pinMode(PIN, OUTPUT);
     PWM_CH = CH;
     //pwm
-  // チャンネルと周波数の分解能を設定
-  int freqIndex = 1;
-  ledcSetup(PWM_CH, PWM_Frequencies[freqIndex], nBits_forPWM);
-  // PWM出力ピンとチャンネルの設定
-  ledcAttachPin(PIN, PWM_CH);
+    // チャンネルと周波数の分解能を設定
+    int freqIndex = 1;
+    ledcSetup(PWM_CH, PWM_Frequencies[freqIndex], nBits_forPWM);
+    // PWM出力ピンとチャンネルの設定
+    ledcAttachPin(PIN, PWM_CH);
+    ledcWrite(PWM_CH, 0);
     _isSetuped =true;
     Serial.println("MOTOR setup was completed.");
   }

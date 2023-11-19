@@ -45,23 +45,23 @@ unsigned long lastmillis; // タイムアウトのための時間変数
 
 
 void setup() {
-
   //M5 INITIAL
   auto cfg =M5.config();
   cfg.internal_imu=false;
   cfg.internal_rtc =false;
-
+  cfg.internal_spk =false;
+  cfg.internal_mic =false;
+  cfg.serial_baudrate = 115200;
   M5.begin(cfg);
   M5.In_I2C.release();
-  Wire.begin(25,21);
+//  Wire.begin(25,21);
+  //MOTOR INITIAL
+  motor.setup(CHANNEL,MOTOR_PIN);
 
   //SERIAL_SetCheckIndex();
 
  //SERIAL_INITIAL
   //SERIAL_setup();
-  Serial.begin(115200); //Serial begin
-  delay(50);   //delay 50ms.  延迟50ms
-  Serial.println("SERIAL setup was completed.");
 
   //PIN MODE INITIAL
   //PHOTO_setup();
@@ -69,8 +69,6 @@ void setup() {
   //INA219_INITIAL
   //INA219_setup();
 
-  //MOTOR INITIAL
-  motor.setup(CHANNEL,MOTOR_PIN);
   //MOTOR SLEEP
 //  pinMode(21, OUTPUT);
  // digitalWrite(21, HIGH);

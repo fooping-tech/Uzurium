@@ -6,38 +6,35 @@ PHOTO photo = PHOTO();
 SW switch1 = SW(SW_PIN,INPUT);
 SW switch2 = SW(TEST_SW_PIN,INPUT_PULLUP);
 
-int Uzurium_Number = 0;
-
 // モードオブジェクトのポインタ
 MODE *currentMode;
-
-unsigned long lastmillis; // タイムアウトのための時間変数
 
 void setup() {
   //M5 INITIAL
   auto cfg =M5.config();
   cfg.internal_imu=false;
   cfg.internal_rtc =false;
-  cfg.internal_spk =false;
-  cfg.internal_mic =false;
   cfg.serial_baudrate = 115200;
   M5.begin(cfg);
   M5.In_I2C.release();
+
   //MOTOR INITIAL
   motor.setup(CHANNEL,MOTOR_PIN);
   photo.setup(PHOTO_PIN);
-
+  
   //MOTOR SLEEP
   // pinMode(21, OUTPUT);
   // digitalWrite(21, HIGH);
+
   //LED_INITIAL
   led.setup(LED_PIN);//led setup (led_num)
+
   //ESP-NOW INITIAL
   ESPNOW_setup();
+
   //初期モードにセット
   currentMode = new StopMode(&photo,&motor,&led);
-  //Core0 WDT無効化
-  //disableCore0WDT();
+  
   //Core0でタスク起動
   xTaskCreatePinnedToCore(
     Uzurium_Task        // タスク関数へのポインタ。無限ループで終了しないよう関数を指定します
@@ -47,8 +44,6 @@ void setup() {
     ,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest..  优先级，3 (configMAX_PRIORITIES - 1) 最高，0 最低。
     ,  NULL //作成タスクのHandleへのポインタ
     ,  0);  //利用するCPUコア(0-1)
-  //LEDの明るさを設定
-  led.setbrightness(LedBrightness);
 }
 
 void Uzurium_Task(void *pvParameters){
@@ -58,15 +53,10 @@ void Uzurium_Task(void *pvParameters){
   }
 }
 
-void Uzurium_ClapModeChange(){
-  if(FFT_CheckMagnitude() > 300){
-  }
-}
-
 void Uzurium_CheckSW(){
-  //スイッチリード(モーメンタリ)
+  //スイッチ(モーメンタリ)
   int sw = switch1.check_m();
-  //スイッチリード(オルタネート)
+  //スイッチ(オルタネート)
   int sw2= switch2.check_a();
   //前回値からの変更有無
   bool sw2st = switch2.check_change();
@@ -83,6 +73,7 @@ void Uzurium_CheckSW(){
   }
 
   if(sw2==1){//オルタネートSW = OFF
+    // ダブル:3 ,長押し:2,短押し:1,押していない:0
     if(sw==1){
       if(currentMode->name != "StopMode"){
         delete currentMode;
@@ -111,11 +102,17 @@ void Uzurium_CheckSW(){
         }else 
         if(currentMode->name=="FeedBackMode"){
           delete currentMode;
+          currentMode = new TimerMode(&photo,&motor,&led);
+        }else
+        if(currentMode->name=="TimerMode"){
+          delete currentMode;
           currentMode = new StopMode(&photo,&motor,&led);
         }
+
     }
  
   }else{//オルタネートSW = ON
+    // ダブル:3 ,長押し:2,短押し:1,押していない:0
     if(sw==1){
       if(currentMode->name != "TestMode"){
         delete currentMode;
@@ -162,10 +159,12 @@ void Uzurium_main(){
     delete currentMode;
     currentMode = new StopMode(&photo,&motor,&led);
   }
-  //所定モードの時のみ実行
+  
+  //RemoteControlModeのときはESPNOW受信値をパラメータにセットする
   if(currentMode->name=="RemoteControlMode"){
     currentMode->SetParams(ESPNOW_CheckDuty(),ESPNOW_CheckHue(),ESPNOW_CheckBrightness());
   }
+  //ADInspectionModeのときにUzurium_Numberを設定する
   if(currentMode->name=="ADInspectionMode"){
         Uzurium_Number =  map(FFT_CheckADvalue(),0,4095,1,18);
   }
@@ -174,6 +173,8 @@ void Uzurium_main(){
 
 void loop() {
   M5.update();
+  //Analog pin読み取り
   FFT_main();
+  //スイッチ状態チェック
   Uzurium_CheckSW();
 }

@@ -5,44 +5,13 @@ RINGLED led = RINGLED();
 PHOTO photo = PHOTO();
 SW switch1 = SW(SW_PIN,INPUT);
 SW switch2 = SW(TEST_SW_PIN,INPUT_PULLUP);
-//SW switch3 = SW(BTN_SW_PIN,INPUT);
 
-//モード定義
-enum Mode{
-  MODE_STOP,
-  MODE_A,
-  MODE_B,
-  MODE_C,
-  MODE_D
-};
-
-Mode Uzu_mode = MODE_STOP;
 int Uzurium_Number = 0;
 
 // モードオブジェクトのポインタ
 MODE *currentMode;
 
-
-//Uzurium MODEをセットする
-void Uzurium_SetMode(Mode mode){
-  
-  //実行中モードをFinishする
-/*  if(MODE_A_CheckInit())MODE_A_Finish();
-  if(MODE_B_CheckInit())MODE_B_Finish();
-  if(MODE_C_CheckInit())MODE_C_Finish();
-  if(MODE_D_CheckInit())MODE_D_Finish();*/
-  //if(MODE_STOP_CheckInit())MODE_STOP_Finish();
-  
-  Uzu_mode = mode;
-  DUMP(Uzu_mode);
-}
-//Uzurium 現在のMODEをCheckする
-Mode Uzurium_CheckState(){
-  return Uzu_mode;
-}
-
 unsigned long lastmillis; // タイムアウトのための時間変数
-
 
 void setup() {
   //M5 INITIAL
@@ -54,37 +23,19 @@ void setup() {
   cfg.serial_baudrate = 115200;
   M5.begin(cfg);
   M5.In_I2C.release();
-//  Wire.begin(25,21);
   //MOTOR INITIAL
   motor.setup(CHANNEL,MOTOR_PIN);
-
-  //SERIAL_SetCheckIndex();
-
- //SERIAL_INITIAL
-  //SERIAL_setup();
-
-  //PIN MODE INITIAL
-  //PHOTO_setup();
   photo.setup(PHOTO_PIN);
-  //INA219_INITIAL
-  //INA219_setup();
 
   //MOTOR SLEEP
-//  pinMode(21, OUTPUT);
- // digitalWrite(21, HIGH);
-  //pinMode(TEST_SW_PIN, INPUT_PULLUP);
+  // pinMode(21, OUTPUT);
+  // digitalWrite(21, HIGH);
   //LED_INITIAL
   led.setup(LED_PIN);//led setup (led_num)
-
   //ESP-NOW INITIAL
   ESPNOW_setup();
-  
-  //SW-INITIAL
-  //SW_setup();
   //初期モードにセット
   currentMode = new StopMode(&photo,&motor,&led);
-//  currentMode = new MODE();
-
   //Core0 WDT無効化
   //disableCore0WDT();
   //Core0でタスク起動
@@ -96,9 +47,8 @@ void setup() {
     ,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest..  优先级，3 (configMAX_PRIORITIES - 1) 最高，0 最低。
     ,  NULL //作成タスクのHandleへのポインタ
     ,  0);  //利用するCPUコア(0-1)
-
+  //LEDの明るさを設定
   led.setbrightness(LedBrightness);
-
 }
 
 void Uzurium_Task(void *pvParameters){
@@ -113,16 +63,13 @@ void Uzurium_ClapModeChange(){
   }
 }
 
-void checkSW(){
+void Uzurium_CheckSW(){
   //スイッチリード(モーメンタリ)
   int sw = switch1.check_m();
-  //int sw3 = switch3.check_m();
-  
   //スイッチリード(オルタネート)
   int sw2= switch2.check_a();
   //前回値からの変更有無
   bool sw2st = switch2.check_change();
-
   //TEST_SWが前回値から変更されていたらsw2の論理にあわせたモードへ変更
   if(sw2st){
       if(sw2==0){
@@ -206,7 +153,6 @@ void checkSW(){
 
 void Uzurium_main(){
 
-  
 // 現在のモードのmainloop()を呼び出す
   currentMode->mainloop();
   currentMode->SetAdValue(FFT_CheckADvalue());
@@ -221,19 +167,13 @@ void Uzurium_main(){
     currentMode->SetParams(ESPNOW_CheckDuty(),ESPNOW_CheckHue(),ESPNOW_CheckBrightness());
   }
   if(currentMode->name=="ADInspectionMode"){
-        Uzurium_Number = VR_CheckValue();
+        Uzurium_Number =  map(FFT_CheckADvalue(),0,4095,1,18);
   }
 
 }
 
 void loop() {
-
   M5.update();
-  //Uzurium_main();
   FFT_main();
-  checkSW();
-  //uint32_t deltaTime = millis() - cycleTime;
-  //uint32_t spentTime = millis() - startTime;
-
-  
+  Uzurium_CheckSW();
 }

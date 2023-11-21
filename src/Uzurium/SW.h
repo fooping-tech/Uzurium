@@ -8,13 +8,14 @@ class SW {
 
 public:
   const int SW_PIN; // ピン番号は定数としてクラスに含める
-  //ピン番号、入力モード(INPUT,INPUT_PULLUP)
+  //コンストラクタ：ピン番号、入力モード(INPUT,INPUT_PULLUP)
   SW(int pin,int mode) : SW_PIN(pin) {
     pinMode(SW_PIN, mode);
+    // 長押しとみなす時間（ミリ秒）
+    longPressDuration = 700;
+    // ダブルクリックとみなす時間間隔（ミリ秒）
+    doubleClickDelay = 300;
     Serial.println("SW setup was completed.");
-  }
-  void setup(int value){
-
   }
   //pin状態確認
   int check_a(){
@@ -23,15 +24,17 @@ public:
   // 状態変化有無
   bool check_change(){
     cur_value = digitalRead(SW_PIN);
-    if(cur_value != last_value){  //前回値と今回値が異なり
+    //前回値と今回値が異なるとき
+    if(cur_value != last_value){
       sw_val = true;
     }else sw_val = false;
-
-    last_value = cur_value;       //前回値を更新
+    //前回値を更新
+    last_value = cur_value;       
     //
     if(sw_val)return true;
     else return false;
   }
+  
   // ダブル:3 ,長押し:2,短押し:1,押していない:0
   int check_m() {
     cur_value = digitalRead(SW_PIN);

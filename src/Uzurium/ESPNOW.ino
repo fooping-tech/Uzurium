@@ -9,11 +9,11 @@ int ESPNOW_hue =0;
 int ESPNOW_brightness=25;
 
 int ESPNOW_CheckDuty(){
-  DUMP(ESPNOW_duty);
+//  DUMP(ESPNOW_duty);
   return ESPNOW_duty;
 }
 int ESPNOW_CheckHue(){
-  DUMP(ESPNOW_hue);
+//  DUMP(ESPNOW_hue);
   return ESPNOW_hue;
 }
 int ESPNOW_CheckBrightness(){
@@ -78,7 +78,6 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len) {
   for(int i=0;i<5;i++){
     if(mac_addr[i] != specificMacAddress[i])flag = false;
   }
-  DUMP(flag);
   if(flag){
     int mode=data[0];
     int value1=data[1];

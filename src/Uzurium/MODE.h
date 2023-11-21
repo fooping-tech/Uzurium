@@ -34,7 +34,11 @@ class MODE{
       _hue = h;
       _brightness = b;
     }
+    void InitActive();
     void InitFunction();
+    void DeinitActive();
+    void DeinitFunction();
+    
     
   protected:
     int TaskSpan;
@@ -47,13 +51,17 @@ class MODE{
     int _InitCounter=0;
     int _InitMode=0;
     int _value=0;
+    bool _DeinitCondition=false;
+    int _DeinitCounter=0;
+    int _DeinitMode=0;
+
     DCMPWM *motor;
     PHOTO *photo;
     RINGLED *led;
     int _duty=0;
     int _hue=0;
     int _brightness=0;
-    int _MaxDuty=100;
+    //int _MaxDuty=100;
 };
 
 class ADinputMode : public MODE {
@@ -82,7 +90,7 @@ public:
       //PID制御によりDUTYを計算する
       photo->ClacDuty(deltaTime);
       //ポテンショ対応;DUTYを上書き
-      int duty = map(adv,0,4095,0,_MaxDuty);
+      int duty = map(adv,0,4095,0,photo->CheckMaxDuty());
       photo->SetDuty(duty);
       motor->move(photo->CheckDuty());
       //motor->move(duty);
@@ -174,6 +182,7 @@ public:
      TaskSpan=10;
      name="FeedBackMode";
     _value=200;//ボタン選択時の色
+    _DeinitMode=8;
      Serial.print("<----");
      Serial.print(name);
      Serial.println("_begin---->");
@@ -189,7 +198,7 @@ public:
         //算出したDUTYでモータを回す
         motor->move(photo->CheckDuty());
         //DUTYに応じてLEDのhueを可変
-        led->fire2(4,photo->CheckDuty());
+        led->fire2(4,photo->CheckDuty()*5);
 //      }
       //Kpをポテンショで可変
       float Kp = map(adv,0,4095,0,1000) * 0.000001;
@@ -211,17 +220,31 @@ public:
       //脱調判定
       photo->CheckOutOfStep();
       //TargetRPM設定
-      if(spentTime>1000)photo->SetTargetRPM(0);
-      if(spentTime>3000) photo->SetTargetRPM(1000);
-      if(spentTime>10000)photo->SetTargetRPM(1500);
-      if(spentTime>15000)photo->SetTargetRPM(2000);
-      if(spentTime>20000)photo->SetTargetRPM(2500);
-      if(spentTime>25000)photo->SetTargetRPM(3000);
-      if(spentTime>30000)photo->SetTargetRPM(3000);
-      if(spentTime>35000)photo->SetTargetRPM(2500);
-      if(spentTime>40000)photo->SetTargetRPM(1500);
-      if(spentTime>45000)photo->SetTargetRPM(0);
-      if(spentTime>50000)active=false;
+      if(spentTime>0)photo->SetTargetRPM(1000);
+      if(spentTime>3000) photo->SetTargetRPM(500);
+      if(spentTime>4000) photo->SetTargetRPM(3000);
+      if(spentTime>10000)photo->SetTargetRPM(1000);
+      if(spentTime>13000) photo->SetTargetRPM(500);
+      if(spentTime>14000)photo->SetTargetRPM(3000);
+      if(spentTime>20000){
+        photo->SetTargetRPM(1000);
+      }
+      if(spentTime>23000) photo->SetTargetRPM(500);
+      if(spentTime>24000)photo->SetTargetRPM(3000);
+      if(spentTime>30000)photo->SetTargetRPM(1000);
+      if(spentTime>33000) photo->SetTargetRPM(500);
+      if(spentTime>34000)photo->SetTargetRPM(3000);
+      if(spentTime>40000){
+        photo->SetTargetRPM(1000);
+      }
+      if(spentTime>43000) photo->SetTargetRPM(500);
+      if(spentTime>44000)photo->SetTargetRPM(3000);
+      if(spentTime>50000)photo->SetTargetRPM(1000);
+      if(spentTime>53000) photo->SetTargetRPM(500);
+      if(spentTime>54000)photo->SetTargetRPM(3000);
+      if(spentTime>60000){
+        DeinitActive();
+      }
 
       //脱調していたら
       if(photo->CheckOutFlag()){
@@ -357,7 +380,11 @@ class TimerMode : public MODE {
      _InitMode=0;//初期化時のブザーモード
      name="TimerMode";
     _value=250;//ボタン選択時の色
-    _time=60 * 1000;//タイマー設定
+    _time=6 * 1000;//タイマー設定
+    _counter=1;
+    _hue = 100;
+    _DeinitMode=7;
+
      Serial.print("<----");
      Serial.print(name);
      Serial.println("_begin---->");
@@ -365,28 +392,204 @@ class TimerMode : public MODE {
     }
     // main関数をオーバーライド
     void main() override {
-      int max_duty = map(adv,0,4095,0,_MaxDuty);
+      int max_duty = map(adv,0,4095,0,photo->CheckMaxDuty());
       int duty = 0;
-      if(spentTime>_time*0)duty= max_duty *0.3;
-      if(spentTime>_time*0.2)duty= max_duty *0.4;
-      if(spentTime>_time*0.3)duty= max_duty *0.5;
-      if(spentTime>_time*0.4)duty= max_duty *0.6;
-      if(spentTime>_time*0.5)duty= max_duty *0.7;
-      if(spentTime>_time*0.6)duty= max_duty *0.8;
-      if(spentTime>_time*0.7)duty= max_duty *0.9;
-      if(spentTime>_time*0.8)duty= max_duty *0.9;
-      if(spentTime>_time*0.9)duty= max_duty *1.0;
-      if(spentTime>_time*1.0){
+/*
+      led->fire2(4,_hue*_counter);
+      if(spentTime>_time*0*_counter/3)duty= max_duty *0.3;
+      if(spentTime>_time*0.2*_counter/3)duty= max_duty *0.2;
+      if(spentTime>_time*0.3*_counter/3)duty= max_duty *0.4;
+      if(spentTime>_time*0.4*_counter/3)duty= max_duty *0.3;
+      if(spentTime>_time*0.5*_counter/3)duty= max_duty *0.5;
+      if(spentTime>_time*0.6*_counter/3)duty= max_duty *0.4;
+      if(spentTime>_time*0.7*_counter/3)duty= max_duty *0.6;
+      if(spentTime>_time*0.8*_counter/3)duty= max_duty *0.5;
+      if(spentTime>_time*0.9*_counter/3)duty= max_duty *1.0;
+      if(spentTime>_time*1.0*_counter/3){
+        _counter++;
+      }
+*/
+      float low=0.3;
+      float middle=0.5;
+      float high=1;
+      int b_low = 25;
+      int b_high = 30;
+
+      
+      if(spentTime>0)duty= max_duty * middle;
+      if(spentTime>3000) duty= max_duty * low;
+      if(spentTime>4000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>10000){
+        led->setbrightness(b_low);
+        duty= max_duty * middle;
+      }
+      if(spentTime>13000)duty= max_duty * low;
+      if(spentTime>14000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>20000){
+        led->setbrightness(b_low);
+        duty= max_duty * middle;
+      }
+      if(spentTime>23000) duty= max_duty * low;
+      if(spentTime>24000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>30000){
+        led->setbrightness(b_low);
+        duty= max_duty * middle;
+      }
+      if(spentTime>33000) duty= max_duty * low;
+      if(spentTime>34000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>40000){
+        led->setbrightness(b_low);
+        duty= max_duty * middle;
+      }
+      if(spentTime>43000) duty= max_duty * low;
+      if(spentTime>44000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>50000){
+        led->setbrightness(b_low);
+        duty= max_duty * middle;
+      }
+      if(spentTime>53000)duty= max_duty * low;
+      if(spentTime>54000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>60000){
+        _hue=200;
+        led->setbrightness(b_low);
+        duty= max_duty * middle;
+      }
+      if(spentTime>63000)  duty= max_duty * low;
+      if(spentTime>64000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>70000){
+        led->setbrightness(b_low);
+        duty= max_duty * middle;
+      }
+      if(spentTime>73000) duty= max_duty * low;
+      if(spentTime>74000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>80000){
+        led->setbrightness(b_low);
+        duty= max_duty * middle;
+      }
+      if(spentTime>83000) duty= max_duty * low;
+      if(spentTime>84000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>90000){
+        led->setbrightness(b_low);
+        duty= max_duty * middle;
+      }
+      if(spentTime>93000) duty= max_duty * low;
+      if(spentTime>94000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>100000){
+        led->setbrightness(b_low);
+        duty= max_duty * middle;
+      }
+      if(spentTime>103000)duty= max_duty * low;
+      if(spentTime>104000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>110000){
+        led->setbrightness(b_low);
+        duty= max_duty * middle;
+      }
+      if(spentTime>113000)duty= max_duty * low;
+      if(spentTime>114000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>120000){
+        _hue=300;
+        duty= max_duty * middle;
+      }
+      if(spentTime>123000)duty= max_duty * low;
+      if(spentTime>124000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>130000){
+        led->setbrightness(b_low);
+        duty= max_duty * middle;
+      }
+      if(spentTime>133000)duty= max_duty * low;
+      if(spentTime>134000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>140000){
+        led->setbrightness(b_low);
+        duty= max_duty * middle;
+      }
+      if(spentTime>143000)duty= max_duty * low;
+      if(spentTime>144000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>150000){
+        led->setbrightness(b_low);
+        duty= max_duty * middle;
+      }
+      if(spentTime>153000)duty= max_duty * low;
+      if(spentTime>154000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>160000){
+        led->setbrightness(b_low);
+        duty= max_duty * middle;
+      }
+      if(spentTime>163000)duty= max_duty * low;
+      if(spentTime>164000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>170000){
+        led->setbrightness(b_low);
+        duty= max_duty * middle;
+      }
+      if(spentTime>173000)duty= max_duty * low;
+      if(spentTime>174000){
+        led->setbrightness(b_high);
+        duty= max_duty * high;
+      }
+      if(spentTime>180000){
         duty = 0;
-        active=false;
+        DeinitActive();
       }
       photo->SetDuty(duty);
       motor->move(photo->CheckDuty());
+      led->fire2(4,_hue+duty);
 
 
     }
   private:
    int _time; //timer
+   int _counter;
 
 };
+
 #endif

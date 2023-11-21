@@ -12,16 +12,28 @@ void MODE::mainloop(){
 
 
   if(deltaTime >= TaskSpan){
-    if(!_InitCondition){
+    if(!_InitCondition){//未初期化時実行
+//      Serial.println("Init");
       InitFunction();
+    }else if(_DeinitCondition){//修了処理時実行
+//      Serial.println("Deinit");
+      DeinitFunction();
     }else{
+//      Serial.println("main()");
       main();
     }
     //cycleTimeリセット
     cycleTime = millis();
   }
 }
-
+void MODE::InitActive(){
+  startTime = millis();
+  _InitCondition=true;
+}
+void MODE::DeinitActive(){
+  startTime = millis();
+  _DeinitCondition=true;
+}
 void MODE::InitFunction(){
   //
   motor->move(10);
@@ -37,7 +49,7 @@ void MODE::InitFunction(){
     if(spentTime>500)motor->changeFreq(8);
     if(spentTime>600){
       motor->move(0);
-      _InitCondition =true;
+      InitActive();;
     }
   }
 
@@ -50,7 +62,7 @@ void MODE::InitFunction(){
     if(spentTime>500)motor->changeFreq(8);
     if(spentTime>600){
       motor->move(0);
-      _InitCondition =true;
+      InitActive();;
     }
   }
   if(_InitMode==2){
@@ -65,7 +77,7 @@ void MODE::InitFunction(){
     if(spentTime>800)motor->changeFreq(8);
     if(spentTime>900){
       motor->move(0);
-      _InitCondition =true;
+      InitActive();;
     }
   }
   if(_InitMode==3){
@@ -85,7 +97,7 @@ void MODE::InitFunction(){
     if(spentTime>600)motor->changeFreq(13);
     if(spentTime>700){
       motor->move(0);
-      _InitCondition =true;
+      InitActive();;
     }
   }
   if(_InitMode==4){
@@ -105,7 +117,7 @@ void MODE::InitFunction(){
     }
     if(spentTime>500){
       motor->move(0);
-      _InitCondition =true;
+      InitActive();;
     }
   }
   if(_InitMode==5){
@@ -117,7 +129,7 @@ void MODE::InitFunction(){
     if(spentTime>500)motor->changeFreq(8);
     if(spentTime>600){
       motor->move(0);
-      _InitCondition =true;
+      InitActive();;
     }
   }
   if(_InitMode==6){
@@ -129,7 +141,239 @@ void MODE::InitFunction(){
     if(spentTime>500)motor->changeFreq(8);
     if(spentTime>600){
       motor->move(0);
-      _InitCondition =true;
+      InitActive();;
+    }
+  }
+  if(_InitMode==7){
+    if(spentTime>0)motor->changeFreq(7);
+    if(spentTime>100)motor->changeFreq(9);
+    if(spentTime>200)motor->changeFreq(8);
+    if(spentTime>300)motor->changeFreq(10);
+    if(spentTime>400)motor->changeFreq(11);
+    if(spentTime>500)motor->changeFreq(12);
+    if(spentTime>600)motor->changeFreq(11);
+    if(spentTime>800)motor->changeFreq(10);
+    if(spentTime>1000)motor->changeFreq(9);
+    if(spentTime>1200)motor->changeFreq(7);
+    if(spentTime>1400){
+      motor->move(0);
+      InitActive();;
+    }
+  }
+}
+
+
+void MODE::DeinitFunction(){
+  //
+//  led->counter(_InitCounter);
+//  _InitCounter++;
+  if(_DeinitMode==0){
+    motor->move(10);
+    if(spentTime>0)motor->changeFreq(8);
+    if(spentTime>100)motor->changeFreq(12);
+    if(spentTime>200)motor->changeFreq(11);
+    if(spentTime>300)motor->changeFreq(10);
+    if(spentTime>400)motor->changeFreq(9);
+    if(spentTime>500)motor->changeFreq(8);
+    if(spentTime>600){
+      motor->move(0);
+      active=false;
+    }
+  }
+
+  if(_DeinitMode==1){
+    motor->move(10);
+    if(spentTime>0)motor->changeFreq(8);
+    if(spentTime>100)motor->changeFreq(9);
+    if(spentTime>200)motor->changeFreq(10);
+    if(spentTime>300)motor->changeFreq(11);
+    if(spentTime>400)motor->changeFreq(12);
+    if(spentTime>500)motor->changeFreq(8);
+    if(spentTime>600){
+      motor->move(0);
+      active=false;
+    }
+  }
+  if(_DeinitMode==2){
+    motor->move(10);
+    if(spentTime>0)motor->changeFreq(8);
+    if(spentTime>100)motor->changeFreq(12);
+    if(spentTime>200)motor->changeFreq(9);
+    if(spentTime>300)motor->changeFreq(12);
+    if(spentTime>400)motor->changeFreq(9);
+    if(spentTime>500)motor->changeFreq(12);
+    if(spentTime>600)motor->changeFreq(9);
+    if(spentTime>700)motor->changeFreq(12);
+    if(spentTime>800)motor->changeFreq(8);
+    if(spentTime>900){
+      motor->move(0);
+      active=false;
+    }
+  }
+  if(_DeinitMode==3){
+    motor->move(10);
+    if(spentTime>0)motor->changeFreq(8);
+    if(spentTime>100)motor->changeFreq(9);
+    if(spentTime>200){
+      motor->changeFreq(10);
+    }
+    if(spentTime>300){
+      motor->move(0);
+    }
+    if(spentTime>400){
+      motor->move(10);
+      motor->changeFreq(11);
+    }
+    if(spentTime>500)motor->changeFreq(12);
+    if(spentTime>600)motor->changeFreq(13);
+    if(spentTime>700){
+      motor->move(0);
+      active=false;
+    }
+  }
+  if(_DeinitMode==4){
+      motor->move(10);
+    if(spentTime>0){
+      motor->changeFreq(12);
+    }
+    if(spentTime>100)motor->move(0);
+    if(spentTime>200){
+      motor->move(10);
+      motor->changeFreq(10);
+    }
+    if(spentTime>300){
+      motor->changeFreq(11);
+    }
+    if(spentTime>400){
+      motor->changeFreq(8);
+    }
+    if(spentTime>500){
+      motor->move(0);
+      active=false;
+    }
+  }
+  if(_DeinitMode==5){
+      motor->move(10);
+    if(spentTime>0)motor->changeFreq(12);
+    if(spentTime>100)motor->changeFreq(8);
+    if(spentTime>200)motor->changeFreq(12);
+    if(spentTime>300)motor->changeFreq(8);
+    if(spentTime>400)motor->changeFreq(12);
+    if(spentTime>500)motor->changeFreq(8);
+    if(spentTime>600){
+      motor->move(0);
+      active=false;
+    }
+  }
+  if(_DeinitMode==6){
+      motor->move(10);
+    if(spentTime>0)motor->changeFreq(12);
+    if(spentTime>100)motor->changeFreq(13);
+    if(spentTime>200)motor->changeFreq(11);
+    if(spentTime>300)motor->changeFreq(10);
+    if(spentTime>400)motor->changeFreq(9);
+    if(spentTime>500)motor->changeFreq(8);
+    if(spentTime>600){
+      motor->move(0);
+      active=false;
+    }
+  }
+  if(_DeinitMode==7){
+    led->clyon();
+    if(spentTime>0){
+      motor->move(10);
+      motor->changeFreq(7);
+    }
+    if(spentTime>100){
+      motor->changeFreq(9);
+      //led->flash(50);
+    }
+    if(spentTime>200){
+      motor->changeFreq(8);
+      //led->flash(100);
+    }
+    if(spentTime>300){
+      motor->changeFreq(10);
+      //led->flash(150);
+    }
+    if(spentTime>400){
+      motor->changeFreq(11);
+      //led->flash(200);
+    }
+    if(spentTime>500){
+      motor->changeFreq(12);
+      //led->flash(250);
+    }
+    if(spentTime>600){
+      motor->changeFreq(11);
+    }
+    if(spentTime>800){
+      motor->changeFreq(10);
+      //led->flash(350);
+    }
+    if(spentTime>1000){
+      motor->changeFreq(9);
+    }
+    if(spentTime>1200){
+      motor->changeFreq(7);
+    }
+    if(spentTime>1400){
+      motor->changeFreq(8);
+    }
+    if(spentTime>4000){
+      motor->move(0);
+    }
+    if(spentTime>8000){
+      active=false;
+    }
+  }
+  if(_DeinitMode==8){
+    led->clyon();
+    if(spentTime>0){
+      motor->move(10);
+      motor->changeFreq(10);
+    }
+    if(spentTime>100){
+      motor->changeFreq(9);
+      //led->flash(50);
+    }
+    if(spentTime>200){
+      motor->changeFreq(8);
+      //led->flash(100);
+    }
+    if(spentTime>300){
+      motor->changeFreq(10);
+      //led->flash(150);
+    }
+    if(spentTime>400){
+      motor->changeFreq(11);
+      //led->flash(200);
+    }
+    if(spentTime>500){
+      motor->changeFreq(12);
+      //led->flash(250);
+    }
+    if(spentTime>600){
+      motor->changeFreq(11);
+    }
+    if(spentTime>800){
+      motor->changeFreq(10);
+      //led->flash(350);
+    }
+    if(spentTime>1000){
+      motor->changeFreq(9);
+    }
+    if(spentTime>1200){
+      motor->changeFreq(7);
+    }
+    if(spentTime>1400){
+      motor->changeFreq(8);
+    }
+    if(spentTime>4000){
+      motor->move(0);
+    }
+    if(spentTime>8000){
+      active=false;
     }
   }
 }

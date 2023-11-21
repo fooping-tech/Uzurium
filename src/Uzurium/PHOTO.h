@@ -28,6 +28,8 @@ class PHOTO{
     void DeleteNowRPMStock();
     int CheckDuty();
     int CheckDuty_p();
+    int CheckMaxDuty();
+    int CheckMinDuty();
     bool CheckTimeout();
     void CheckOutOfStep();
     bool CheckOutFlag();

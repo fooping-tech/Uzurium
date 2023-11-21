@@ -109,7 +109,7 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len) {
             break;
           case 3:
             delete currentMode;
-            currentMode = new FeedBackMode(&photo,&motor,&led);
+            currentMode = new TimerMode(&photo,&motor,&led);
             break;
           case 1:
             delete currentMode;

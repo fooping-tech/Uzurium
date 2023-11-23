@@ -294,7 +294,7 @@ public:
      led->setbrightness(10);
      _InitMode=3;
      name="PhotoReflectorInspectionMode";
-    _value=220;//ボタン選択時の色
+    _value=100;//ボタン選択時の色
      Serial.print("<----");
      Serial.print(name);
      Serial.println("_begin---->");

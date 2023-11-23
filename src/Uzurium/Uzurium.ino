@@ -33,8 +33,12 @@ void setup() {
   ESPNOW_setup();
 
   //初期モードにセット
-  currentMode = new StopMode(&photo,&motor,&led);
-  
+  if(switch2.check_a()==1){
+    currentMode = new StopMode(&photo,&motor,&led);
+  }
+  else{
+    currentMode = new TestMode(&photo,&motor,&led);
+  }
   //Core0でタスク起動
   xTaskCreatePinnedToCore(
     Uzurium_Task        // タスク関数へのポインタ。無限ループで終了しないよう関数を指定します

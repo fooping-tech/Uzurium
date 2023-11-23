@@ -97,6 +97,7 @@ void MODE::InitFunction(){
     if(spentTime>600)motor->changeFreq(13);
     if(spentTime>700){
       motor->move(0);
+      led->level(0);
       InitActive();;
     }
   }

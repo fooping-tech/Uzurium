@@ -9,11 +9,11 @@ int ESPNOW_hue =0;
 int ESPNOW_brightness=25;
 
 int ESPNOW_CheckDuty(){
-  DUMP(ESPNOW_duty);
+//  DUMP(ESPNOW_duty);
   return ESPNOW_duty;
 }
 int ESPNOW_CheckHue(){
-  DUMP(ESPNOW_hue);
+//  DUMP(ESPNOW_hue);
   return ESPNOW_hue;
 }
 int ESPNOW_CheckBrightness(){
@@ -78,7 +78,6 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len) {
   for(int i=0;i<5;i++){
     if(mac_addr[i] != specificMacAddress[i])flag = false;
   }
-  DUMP(flag);
   if(flag){
     int mode=data[0];
     int value1=data[1];
@@ -96,19 +95,24 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len) {
     if(mode==0){
       switch(value1){
           case 0:
-            Uzurium_SetMode(MODE_STOP);
+            delete currentMode;
+            currentMode = new StopMode(&photo,&motor,&led);
             break;
           case 4:
-            Uzurium_SetMode(MODE_A);
+            delete currentMode;
+            currentMode = new ADinputMode(&photo,&motor,&led);
             break;
           case 2:
-            Uzurium_SetMode(MODE_B);
+            delete currentMode;
+            currentMode = new FeedBackMode(&photo,&motor,&led);
             break;
           case 3:
-            Uzurium_SetMode(MODE_C);
+            delete currentMode;
+            currentMode = new TimerMode(&photo,&motor,&led);
             break;
           case 1:
-            Uzurium_SetMode(MODE_D);
+            delete currentMode;
+            currentMode = new RemoteControlMode(&photo,&motor,&led);
             break;
         }
     }

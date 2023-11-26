@@ -40,6 +40,9 @@ void FFT_Finish(){
 double FFT_CheckPeak(){
   return FFT_Peak;
 }
+int FFT_CheckADvalue(){
+  return FFT_ADvalue;
+}
 int FFT_CheckMagnitude(){
   //DUMP(FFT_Magnitude);
   return FFT_Magnitude;

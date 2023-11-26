@@ -39,6 +39,8 @@ void MODE_B_main(){
         for(int i=1;i<=5;i++) send_data(1,i,duty,100+x,25+y);
       }
       else{
+        if(BUTTON_check_blue())TRACE();
+        if(BUTTON_check_red())TRACE();
         for(int i=1;i<=5;i++) send_data(1,i,0,10,25);
       }
     }

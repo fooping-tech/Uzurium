@@ -11,13 +11,15 @@ MODE *currentMode;
 
 void setup() {
   //M5 INITIAL
+  /*
   auto cfg =M5.config();
   cfg.internal_imu=false;
   cfg.internal_rtc =false;
   cfg.serial_baudrate = 115200;
   M5.begin(cfg);
   M5.In_I2C.release();
-
+  */
+  M5.begin(true, false, true); 
   //MOTOR INITIAL
   motor.setup(CHANNEL,MOTOR_PIN);
   photo.setup(PHOTO_PIN);
@@ -95,7 +97,7 @@ void Uzurium_CheckSW(){
         delete currentMode;
         currentMode = new TimerMode(&photo,&motor,&led);
     }
-    if(M5.BtnA.wasPressed()){
+    if(M5.Btn.wasPressed()){
         if(currentMode->name=="StopMode"){
           delete currentMode;
           currentMode = new ADinputMode(&photo,&motor,&led);
@@ -135,7 +137,7 @@ void Uzurium_CheckSW(){
         currentMode = new LedInspectionMode(&photo,&motor,&led);
       
     }
-      if(M5.BtnA.wasPressed()){
+      if(M5.Btn.wasPressed()){
         if(currentMode->name=="TestMode"){
           delete currentMode;
           currentMode = new ADInspectionMode(&photo,&motor,&led);

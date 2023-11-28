@@ -1,7 +1,9 @@
 #ifndef RINGLED_H
 #define RINGLED_H
 
-#include <M5Unified.h>
+//#include <M5Unified.h>
+#include <M5Atom.h>
+
 #include <FastLED.h>
 //LED Setting
 #define FPS 120

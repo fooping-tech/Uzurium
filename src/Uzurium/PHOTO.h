@@ -1,7 +1,9 @@
 #ifndef PHOTO_H
 #define PHOTO_H
 
-#include <M5Unified.h>
+//#include <M5Unified.h>
+#include <M5Atom.h>
+
 
 #define STOCK_RPMS 5
 

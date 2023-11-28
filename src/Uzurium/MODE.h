@@ -1,7 +1,9 @@
 #ifndef MODE_H
 #define MODE_H
 
-#include <M5Unified.h>
+//#include <M5Unified.h>
+#include <M5Atom.h>
+
 #include "DCMPWM.h"
 #include "RINGLED.h"
 #include "PHOTO.h"

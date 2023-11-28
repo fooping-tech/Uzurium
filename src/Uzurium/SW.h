@@ -1,7 +1,9 @@
 #ifndef SW_H
 #define SW_H
 
-#include <M5Unified.h>
+//#include <M5Unified.h>
+#include <M5Atom.h>
+
 
 class SW {
 

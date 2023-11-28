@@ -1,7 +1,8 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
-#include <M5Unified.h>
+//#include <M5Unified.h>
+#include <M5Atom.h>
 #include <esp_now.h>
 #include <WiFi.h>
 #include <Wire.h>

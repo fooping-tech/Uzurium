@@ -59,7 +59,7 @@ Arduino IDEインストール済み、M5Stackのボードマネージャがイ�
 ## 2. ライブラリのインストール
 
 Arduino IDEのライブラリマネージャから以下のライブラリをインストールしてください。
-- M5Unified
+- M5Atom
 - FastLED
 - arduinoFFT
 

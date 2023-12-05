@@ -43,23 +43,23 @@ class MODE{
     
     
   protected:
-    int TaskSpan;
-    uint32_t startTime;
-    uint32_t cycleTime;
-    uint32_t deltaTime;
-    uint32_t spentTime;
-    int adv;
-    bool _InitCondition=false;
-    int _InitCounter=0;
-    int _InitMode=0;
-    int _value=0;
-    bool _DeinitCondition=false;
-    int _DeinitCounter=0;
-    int _DeinitMode=0;
+    int TaskSpan;       //タスク実行間隔
+    uint32_t startTime; //開始時間
+    uint32_t cycleTime; //サイクルタイム
+    uint32_t deltaTime; //
+    uint32_t spentTime; //経過時間
+    int adv;            //AD value
+    bool _InitCondition=false;  //初期化状態
+    int _InitCounter=0;         //カウンタ
+    int _InitMode=0;            //初期化モード
+    int _value=0;                 //ボタン選択時の色
+    bool _DeinitCondition=false;  //終了時状態
+    int _DeinitCounter=0;         //終了時カウンタ
+    int _DeinitMode=0;            //終了時モード
 
-    DCMPWM *motor;
-    PHOTO *photo;
-    RINGLED *led;
+    DCMPWM *motor;        //モータインスタンスのポインタ
+    PHOTO *photo;         //フォトインスタンスのポインタ
+    RINGLED *led;         //LEDインスタンスのポインタ
     int _duty=0;
     int _hue=0;
     int _brightness=0;

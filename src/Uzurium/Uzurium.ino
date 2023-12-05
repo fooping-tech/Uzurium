@@ -1,5 +1,10 @@
 #include "./configuration.h"
-
+#if __has_include("Setting.h")
+#include "./Setting.h"
+#else
+#define WIFI_SSID "your_ssid"
+#define WIFI_PASS "your_password"
+#endif
 DCMPWM motor = DCMPWM();
 RINGLED led = RINGLED();
 PHOTO photo = PHOTO();
@@ -9,16 +14,30 @@ SW switch2 = SW(TEST_SW_PIN,INPUT_PULLUP);
 // モードオブジェクトのポインタ
 MODE *currentMode;
 
+// WiFiの接続処理
+void initWiFi() {
+  WiFi.mode(WIFI_STA);
+  Serial.print("\nConnecting to " WIFI_SSID);
+  WiFi.begin(WIFI_SSID, WIFI_PASS);     // WiFiに接続
+  int i = 1;
+  while (WiFi.status() != WL_CONNECTED) { // WiFiが繋がるまでループ
+    if (i > 20) {                       // 10秒のタイムアウト
+      Serial.println("\n========== WiFi connecting timeout! ==========\n");
+      //ESP.restart();                    // リセット
+      break;
+    }
+    delay(500);                         // 500ミリ秒待つ
+    Serial.print(".");                  // ログに「.」を表示
+    i++;
+  }
+  Serial.println("\nWiFi connected");   // ログに「WiFi connected」を表示
+  Serial.print("IP address: ");         // ログにIPアドレスを表示
+  Serial.println(WiFi.localIP());
+}
+
 void setup() {
   //M5 INITIAL
-  /*
-  auto cfg =M5.config();
-  cfg.internal_imu=false;
-  cfg.internal_rtc =false;
-  cfg.serial_baudrate = 115200;
-  M5.begin(cfg);
-  M5.In_I2C.release();
-  */
+
   M5.begin(true, false, true); 
   //MOTOR INITIAL
   motor.setup(CHANNEL,MOTOR_PIN);
@@ -33,6 +52,10 @@ void setup() {
 
   //ESP-NOW INITIAL
   ESPNOW_setup();
+  initWiFi();                           // WiFiの接続処理
+  // NTPの初期化
+  configTzTime("JST-9", "ntp.nict.jp"); 
+  //timeInfo.tm_year + 1900 //timeInfo.tm_mon + 1 //timeInfo.tm_mday //timeInfo.tm_hour //timeInfo.tm_min //timeInfo.tm_sec
 
   //初期モードにセット
   if(switch2.check_a()==1){
@@ -56,6 +79,15 @@ void Uzurium_Task(void *pvParameters){
   while(1){
     Uzurium_main();
     delay(1);
+  }
+}
+
+void Uzurium_Ntp(){
+  struct tm timeInfo;
+  getLocalTime(&timeInfo);
+  if(timeInfo.tm_sec == 0 && currentMode->name == "StopMode"){
+    delete currentMode;
+    currentMode = new TimerMode(&photo,&motor,&led);
   }
 }
 
@@ -97,6 +129,10 @@ void Uzurium_CheckSW(){
         delete currentMode;
         currentMode = new TimerMode(&photo,&motor,&led);
     }
+
+
+
+    //M5AtomSWプッシュ時の動作
     if(M5.Btn.wasPressed()){
         if(currentMode->name=="StopMode"){
           delete currentMode;
@@ -137,7 +173,8 @@ void Uzurium_CheckSW(){
         currentMode = new LedInspectionMode(&photo,&motor,&led);
       
     }
-      if(M5.Btn.wasPressed()){
+
+    if(M5.Btn.wasPressed()){
         if(currentMode->name=="TestMode"){
           delete currentMode;
           currentMode = new ADInspectionMode(&photo,&motor,&led);
@@ -183,4 +220,8 @@ void loop() {
   FFT_main();
   //スイッチ状態チェック
   Uzurium_CheckSW();
+  //Ntpチェック
+  if(WiFi.status() == WL_CONNECTED){
+    Uzurium_Ntp();
+  }
 }

@@ -138,10 +138,11 @@ public:
     }
     // main関数をオーバーライド
     void main() override {
-        motor->move(0);
-        //DUTYに応じてLEDのhueを可変
-        led->pacifica();
+      motor->move(0);
+      //DUTYに応じてLEDのhueを可変
+      led->pacifica();
     }
+    
 
     private:
   };

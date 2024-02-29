@@ -41,7 +41,7 @@ void MODE_B_main(){
       else{
         if(BUTTON_check_blue())TRACE();
         if(BUTTON_check_red())TRACE();
-        for(int i=1;i<=5;i++) send_data(1,i,0,10,25);
+        for(int i=1;i<=9;i++) send_data(1,i,0,10,25);
       }
     }
     

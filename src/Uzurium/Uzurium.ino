@@ -52,9 +52,9 @@ void setup() {
 
   //ESP-NOW INITIAL
   ESPNOW_setup();
-  initWiFi();                           // WiFiの接続処理
+  //initWiFi();                           // WiFiの接続処理
   // NTPの初期化
-  configTzTime("JST-9", "ntp.nict.jp"); 
+  //configTzTime("JST-9", "ntp.nict.jp"); 
   //timeInfo.tm_year + 1900 //timeInfo.tm_mon + 1 //timeInfo.tm_mday //timeInfo.tm_hour //timeInfo.tm_min //timeInfo.tm_sec
 
   //初期モードにセット
@@ -221,7 +221,7 @@ void loop() {
   //スイッチ状態チェック
   Uzurium_CheckSW();
   //Ntpチェック
-  if(WiFi.status() == WL_CONNECTED){
-    Uzurium_Ntp();
-  }
+  // if(WiFi.status() == WL_CONNECTED){
+  //   Uzurium_Ntp();
+  // }
 }

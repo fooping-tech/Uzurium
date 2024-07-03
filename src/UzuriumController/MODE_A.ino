@@ -32,7 +32,7 @@ struct MODE_A_Uzu {
     send_data(1,id,duty,hue,brightness);
   }
 };
-MODE_A_Uzu myMODE_A_Uzu[5];
+MODE_A_Uzu myMODE_A_Uzu[9];
 
 // モードの定義
 enum MODE_A_SQMode {
@@ -59,20 +59,33 @@ void MODE_A_Init(){
     TRACE();
 
     myMODE_A_Uzu[0].id=1;
-    myMODE_A_Uzu[0].x=3;
+    myMODE_A_Uzu[0].x=5;
     myMODE_A_Uzu[0].y=1;
     myMODE_A_Uzu[1].id=2;
-    myMODE_A_Uzu[1].x=2;
+    myMODE_A_Uzu[1].x=4;
     myMODE_A_Uzu[1].y=2;
     myMODE_A_Uzu[2].id=3;
-    myMODE_A_Uzu[2].x=4;
+    myMODE_A_Uzu[2].x=6;
     myMODE_A_Uzu[2].y=2;
     myMODE_A_Uzu[3].id=4;
-    myMODE_A_Uzu[3].x=1;
+    myMODE_A_Uzu[3].x=3;
     myMODE_A_Uzu[3].y=3;
     myMODE_A_Uzu[4].id=5;
-    myMODE_A_Uzu[4].x=5;
+    myMODE_A_Uzu[4].x=7;
     myMODE_A_Uzu[4].y=3;
+    myMODE_A_Uzu[5].id=6;
+    myMODE_A_Uzu[5].x=2;
+    myMODE_A_Uzu[5].y=4;
+    myMODE_A_Uzu[6].id=7;
+    myMODE_A_Uzu[6].x=8;
+    myMODE_A_Uzu[6].y=4;
+    myMODE_A_Uzu[7].id=8;
+    myMODE_A_Uzu[7].x=1;
+    myMODE_A_Uzu[7].y=5;
+    myMODE_A_Uzu[8].id=9;
+    myMODE_A_Uzu[8].x=9;
+    myMODE_A_Uzu[8].y=5;
+
     
 
 }
@@ -84,7 +97,7 @@ void MODE_A_Finish(){
 }
 
 void MODE_A_AllSQ(int duty,int hue ,int brightness){
-      for(int i=0;i<5;i++){
+      for(int i=0;i<9;i++){
         myMODE_A_Uzu[i].duty = duty;
         myMODE_A_Uzu[i].hue = hue;
         myMODE_A_Uzu[i].brightness = brightness;
@@ -93,7 +106,7 @@ void MODE_A_AllSQ(int duty,int hue ,int brightness){
 
 }
 void MODE_A_YFRONTSQ(int duty,int hue ,int brightness){
-      for(int i=0;i<5;i++){
+      for(int i=0;i<9;i++){
         if(MODE_A_CountY >= myMODE_A_Uzu[i].y && myMODE_A_Uzu[i].y >= MODE_A_CountY -1 ){
           myMODE_A_Uzu[i].duty = 75;
           myMODE_A_Uzu[i].hue = hue+50;
@@ -110,7 +123,7 @@ void MODE_A_YFRONTSQ(int duty,int hue ,int brightness){
       
 }
 void MODE_A_XleftSQ(int duty,int hue ,int brightness){
-      for(int i=0;i<5;i++){
+      for(int i=0;i<9;i++){
       if(MODE_A_PlusX >= myMODE_A_Uzu[i].x && myMODE_A_Uzu[i].x >= MODE_A_PlusX -5 ){
         myMODE_A_Uzu[i].duty = 75;
         myMODE_A_Uzu[i].hue = hue+50;
@@ -127,7 +140,7 @@ void MODE_A_XleftSQ(int duty,int hue ,int brightness){
     
 }
 void MODE_A_XRIGHTSQ(int duty,int hue ,int brightness){
-      for(int i=0;i<5;i++){
+      for(int i=0;i<9;i++){
       if(MODE_A_MinusX >= myMODE_A_Uzu[i].x && myMODE_A_Uzu[i].x >= MODE_A_MinusX -5 ){
         myMODE_A_Uzu[i].duty = 75;
         myMODE_A_Uzu[i].hue = hue+50;
@@ -161,13 +174,13 @@ void MODE_A_main(){
     //Serial.println(duty);
 
     //タッチされたらduty=0で脱腸解除
-    if (M5.Touch.isEnabled()) {
-    auto t = M5.Touch.getDetail();
-    auto x = t.distanceX();
-    auto y = t.distanceY();
-    auto p = t.isPressed();
-    if(p==1)duty=0;
-    }
+    // if (M5.Touch.isEnabled()) {
+    // auto t = M5.Touch.getDetail();
+    // auto x = t.distanceX();
+    // auto y = t.distanceY();
+    // auto p = t.isPressed();
+    // if(p==1)duty=0;
+    // }
 
     //小dutyは無視
     if(duty < 15){

@@ -36,7 +36,7 @@ void MODE_B_main(){
         int duty = 50 + y;
         if(duty > 200)duty =200;
         if(duty < 0 )duty = 0;
-        for(int i=1;i<=5;i++) send_data(1,i,duty,100+x,25+y);
+        for(int i=1;i<=9;i++) send_data(1,i,duty,100+x,25+y);
       }
       else{
         if(BUTTON_check_blue())TRACE();

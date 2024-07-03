@@ -57,34 +57,47 @@ void Uzurium_Task(void *pvParameters){
 void loop(void){
   FFT_main();
 }
+bool CheckTouch(){
+  if (M5.Touch.isEnabled()) {
+      auto t = M5.Touch.getDetail();
+      auto p = t.isPressed();
+      if(p==1)return true;
+  }
+  return false;
+}
 
 void Uzurium_main(void){
   M5.update();
 
-  
+  if(CheckTouch() && !MODE_B_CheckInit()){
+    SetMode(MODE_B);
+  }
   //SW
   if(M5.BtnA.wasPressed()){
-//    send_data(0,0,0,0,0);
-    send_data(0,1,0,0,0);
+    send_data(0,1,0,0,0);//RemoteControlModeへ入れる
     FinishMode();
     SetMode(MODE_A);
   }
   if(M5.BtnB.wasPressed()){
-    send_data(0,1,0,0,0);
+    send_data(0,1,0,0,0);//RemoteControlModeへ入れる
     FinishMode();
     SetMode(MODE_B);
   }
   if(M5.BtnC.wasPressed()){
-    send_data(0,1,0,0,0);
+    send_data(0,1,0,0,0);//RemoteControlModeへ入れる
     FinishMode();
     SetMode(MODE_C);
   }
   if(BUTTON_check_red()){
-    send_data(0,1,0,0,0);
+    send_data(0,1,0,0,0);//RemoteControlModeへ入れる
     FinishMode();
-    SetMode(MODE_D);
+    SetMode(MODE_A);
   }
-  
+  if(BUTTON_check_blue()){
+    send_data(0,1,0,0,0);//RemoteControlModeへ入れる
+    FinishMode();
+    SetMode(MODE_C);
+  }  
   //MODE
   if(mode == MODE_STOP){
     MODE_STOP_main();

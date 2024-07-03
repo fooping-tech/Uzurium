@@ -32,7 +32,7 @@ struct Uzu {
     send_data(1,id,duty,hue,brightness);
   }
 };
-Uzu myUzu[5];
+Uzu myUzu[9];
 
 // モードの定義
 enum SQMode {
@@ -59,21 +59,32 @@ void MODE_C_Init(){
     TRACE();
 
     myUzu[0].id=1;
-    myUzu[0].x=3;
+    myUzu[0].x=5;
     myUzu[0].y=1;
     myUzu[1].id=2;
-    myUzu[1].x=2;
+    myUzu[1].x=4;
     myUzu[1].y=2;
     myUzu[2].id=3;
-    myUzu[2].x=4;
+    myUzu[2].x=6;
     myUzu[2].y=2;
     myUzu[3].id=4;
-    myUzu[3].x=1;
+    myUzu[3].x=3;
     myUzu[3].y=3;
     myUzu[4].id=5;
-    myUzu[4].x=5;
+    myUzu[4].x=7;
     myUzu[4].y=3;
-    
+    myUzu[5].id=6;
+    myUzu[5].x=2;
+    myUzu[5].y=4;
+    myUzu[6].id=7;
+    myUzu[6].x=8;
+    myUzu[6].y=4;
+    myUzu[7].id=8;
+    myUzu[7].x=1;
+    myUzu[7].y=5;
+    myUzu[8].id=9;
+    myUzu[8].x=9;
+    myUzu[8].y=5;
 
 }
 //終了処理
@@ -84,7 +95,7 @@ void MODE_C_Finish(){
 }
 
 void AllSQ(int duty,int hue ,int brightness){
-      for(int i=0;i<5;i++){
+      for(int i=0;i<9;i++){
         myUzu[i].duty = duty;
         myUzu[i].hue = hue;
         myUzu[i].brightness = brightness;
@@ -93,7 +104,7 @@ void AllSQ(int duty,int hue ,int brightness){
 
 }
 void YfrontSQ(int duty,int hue ,int brightness){
-      for(int i=0;i<5;i++){
+      for(int i=0;i<9;i++){
         if(CountY >= myUzu[i].y && myUzu[i].y >= CountY -1 ){
           myUzu[i].duty = 75;
           myUzu[i].hue = hue+50;
@@ -110,7 +121,7 @@ void YfrontSQ(int duty,int hue ,int brightness){
       
 }
 void XleftSQ(int duty,int hue ,int brightness){
-      for(int i=0;i<5;i++){
+      for(int i=0;i<9;i++){
       if(PlusX >= myUzu[i].x && myUzu[i].x >= PlusX -5 ){
         myUzu[i].duty = 75;
         myUzu[i].hue = hue+50;
@@ -127,7 +138,7 @@ void XleftSQ(int duty,int hue ,int brightness){
     
 }
 void XrightSQ(int duty,int hue ,int brightness){
-      for(int i=0;i<5;i++){
+      for(int i=0;i<9;i++){
       if(MinusX >= myUzu[i].x && myUzu[i].x >= MinusX -5 ){
         myUzu[i].duty = 75;
         myUzu[i].hue = hue+50;
@@ -154,22 +165,24 @@ void MODE_C_main(){
 
     int duty = 0;
     int value = analogRead(ANALOG_VR_PIN);
-    value = map(value,4095,0,0,2000);
+    value = map(value,4095,0,1,2000);
     int gain = map(value,2000,0,0,100);
+    
     int mag = FFT_CheckMagnitude();
     duty = map(mag,0,value,0,200);
-    int brightness = map(duty,0,200,25,75);
+    if(duty > 100)duty = 100;
+    int brightness = map(duty,0,100,25,75);
     //DUMP(duty);
     //Serial.println(duty);
 
     //タッチされたらduty=0で脱腸解除
-    if (M5.Touch.isEnabled()) {
-    auto t = M5.Touch.getDetail();
-    auto x = t.distanceX();
-    auto y = t.distanceY();
-    auto p = t.isPressed();
-    if(p==1)duty=0;
-    }
+    // if (M5.Touch.isEnabled()) {
+    // auto t = M5.Touch.getDetail();
+    // auto x = t.distanceX();
+    // auto y = t.distanceY();
+    // auto p = t.isPressed();
+    // if(p==1)duty=0;
+    // }
 
     //小dutyは無視
     if(duty < 15){
@@ -196,7 +209,7 @@ void MODE_C_main(){
       MODE_C_Timer1 =millis();
     }
     M5.Display.setCursor(0, 0);
-    M5.Display.printf("Gain = %4d, duty = %4d, hue = %4d, bright = %4d", gain,duty,hue,brightness);
+    M5.Display.printf("Gain = %.3f, duty = %4d, hue = %4d, bright = %4d", gain,duty,hue,brightness);
     M5.Display.endWrite();
 
     //所定時間経過したら

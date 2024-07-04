@@ -70,6 +70,7 @@ void Uzurium_main(void){
   M5.update();
 
   if(CheckTouch() && !MODE_B_CheckInit()){
+    send_data(0,1,0,0,0);//RemoteControlModeへ入れる
     SetMode(MODE_B);
   }
   //SW

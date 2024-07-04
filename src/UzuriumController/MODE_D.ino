@@ -33,6 +33,7 @@ void MODE_D_main(){
       if(MODE_D_duty<0)MODE_D_duty = 0;
     }
     if(BUTTON_check_blue())MODE_D_duty +=5;
+    send_data(1,0,MODE_D_duty,100+MODE_D_duty,25);//for IVS
     for(int i=1;i<=9;i++) send_data(1,i,MODE_D_duty,100+MODE_D_duty,25);
 //      if(BUTTON_check_red())for(int i=1;i<=5;i++) send_data(1,i,0,100,25);
     //M5.Lcd.setTextDatum(1);                                 // 上中央基準

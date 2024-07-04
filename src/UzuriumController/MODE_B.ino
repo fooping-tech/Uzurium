@@ -1,7 +1,15 @@
 bool MODE_B_Initialized = false;
+uint32_t MODE_B_startTime = 0;//経過時間
+uint32_t MODE_B_Timer1 = 0;//タイマー
+uint32_t MODE_B_Timer2 = 0;//タイマー
 //初期化処理
 void MODE_B_Init(){
-
+    //startTimeに現在時刻を設定
+    MODE_B_startTime = millis();
+    //タイマーに現在時刻を設定
+    MODE_B_Timer1 = millis();
+    //タイマーに現在時刻を設定
+    MODE_B_Timer2 = millis();
     //初期化フラグを立てる
     MODE_B_Initialized = true;
     DISP_PictWrite();
@@ -36,14 +44,21 @@ void MODE_B_main(){
         int duty = 50 + y;
         if(duty > 200)duty =200;
         if(duty < 0 )duty = 0;
+        send_data(1,0,duty,100+x,25+y);//for IVS
         for(int i=1;i<=9;i++) send_data(1,i,duty,100+x,25+y);
+        MODE_B_Timer1=millis();//for IVS
       }
       else{
         if(BUTTON_check_blue())TRACE();
         if(BUTTON_check_red())TRACE();
+        send_data(1,0,0,10,25);
         for(int i=1;i<=9;i++) send_data(1,i,0,10,25);
       }
     }
-    
+    //所定時間経過したら
+    if(millis() - MODE_B_Timer1 > 1500){
+      FinishMode();
+      SetMode(MODE_A);
+    }
   }
 }

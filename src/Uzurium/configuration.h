@@ -34,7 +34,7 @@
 //SW setting オルタネート
 #define TEST_SW_PIN 21
 
-int Uzurium_Number = 5;
+int Uzurium_Number = 2;
 
 
 

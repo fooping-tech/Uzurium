@@ -54,7 +54,7 @@ void MODE_C_Init(){
     MODE_C_Timer2 = millis();
     //初期化フラグを立てる
     MODE_C_Initialized = true;
-    DISP_PictWrite();
+    DISP_PictWrite_MODE_C();
     M5.Lcd.fillCircle(320-55, 240-40, 5, RED);
     TRACE();
 
@@ -86,6 +86,8 @@ void MODE_C_Init(){
     myUzu[8].x=9;
     myUzu[8].y=5;
 
+    //
+    //led.flash(100);
 }
 //終了処理
 void MODE_C_Finish(){
@@ -165,12 +167,13 @@ void MODE_C_main(){
 
     int duty = 0;
     int value = analogRead(ANALOG_VR_PIN);
+    
     value = map(value,4095,0,1,2000);
     int gain = map(value,2000,0,0,100);
     
     int mag = FFT_CheckMagnitude();
     duty = map(mag,0,value,0,200);
-    if(duty > 100)duty = 100;
+    if(duty > 120)duty = 120;
     int brightness = map(duty,0,100,25,75);
     //DUMP(duty);
     //Serial.println(duty);
@@ -195,6 +198,7 @@ void MODE_C_main(){
       TRACE();
 
     }
+    
     //大dutyをトリガに色を変更
     if(duty>100){
       hue += 50;
@@ -209,7 +213,7 @@ void MODE_C_main(){
       MODE_C_Timer1 =millis();
     }
     M5.Display.setCursor(0, 0);
-    M5.Display.printf("Gain = %.3f, duty = %4d, hue = %4d, bright = %4d", gain,duty,hue,brightness);
+    M5.Display.printf("Gain = %3d, duty = %4d, hue = %4d, bright = %4d", gain,duty,hue,brightness);
     M5.Display.endWrite();
 
     //所定時間経過したら

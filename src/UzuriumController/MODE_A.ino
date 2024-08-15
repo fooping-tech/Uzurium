@@ -1,3 +1,4 @@
+//STBモード
 const int MODE_A_TaskSpan = 100; // タスク実行間隔(ms)
 
 uint32_t MODE_A_startTime = 0;//経過時間

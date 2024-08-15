@@ -1,7 +1,15 @@
+//DISPモード
 bool MODE_B_Initialized = false;
 uint32_t MODE_B_startTime = 0;//経過時間
 uint32_t MODE_B_Timer1 = 0;//タイマー
 uint32_t MODE_B_Timer2 = 0;//タイマー
+const uint32_t MODE_B_LimitTime = 10000;//mill sec
+uint32_t MODE_B_duty = 0;
+
+uint32_t MODE_B_CheckDuty(){
+  return MODE_B_duty;
+}
+
 //初期化処理
 void MODE_B_Init(){
     //startTimeに現在時刻を設定
@@ -12,7 +20,7 @@ void MODE_B_Init(){
     MODE_B_Timer2 = millis();
     //初期化フラグを立てる
     MODE_B_Initialized = true;
-    DISP_PictWrite();
+    DISP_PictWrite_MODE_B();
     M5.Lcd.fillCircle(320/2, 240-40, 5, RED);
     TRACE();
 }
@@ -40,13 +48,14 @@ void MODE_B_main(){
       M5.Display.setCursor(0, 0);
       M5.Display.printf("x = %4d, y = %4d, press = %d", x, y, p);
       M5.Display.endWrite();
-      if(p==1){
-        int duty = 50 + y;
-        if(duty > 200)duty =200;
+      if(p==1){//画面をタッチしたら
+        int duty = 10+y/4;
+        if(duty > 160)duty =160;
         if(duty < 0 )duty = 0;
+        MODE_B_duty = duty;
         send_data(1,0,duty,100+x,25+y);//for IVS
         for(int i=1;i<=9;i++) send_data(1,i,duty,100+x,25+y);
-        MODE_B_Timer1=millis();//for IVS
+        MODE_B_Timer1=millis();//DISPモード抜けるまでのタイマをリセット
       }
       else{
         if(BUTTON_check_blue())TRACE();
@@ -56,7 +65,7 @@ void MODE_B_main(){
       }
     }
     //所定時間経過したら
-    if(millis() - MODE_B_Timer1 > 1500){
+    if(millis() - MODE_B_Timer1 > MODE_B_LimitTime){
       FinishMode();
       SetMode(MODE_A);
     }

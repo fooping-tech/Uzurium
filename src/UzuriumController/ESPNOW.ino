@@ -1,3 +1,4 @@
+#define ESPNOW_SEND_WAIT_TIME 10//ESP-NOW送信後の待ち時間(短いほうがレスポンス高い)
 esp_now_peer_info_t slave;
 
 void ESPNOW_setup(){
@@ -65,24 +66,7 @@ void send_data(int mode,int value1,int value2,int value3,int value4){
     uint8_t data[5] = {mode,value1,value2,value3,value4};
 
     esp_err_t result = esp_now_send(slave.peer_addr, data, sizeof(data));
-    /*
-    Serial.print("Send Status: ");
-    if (result == ESP_OK) {
-      Serial.println("Success");
-    } else if (result == ESP_ERR_ESPNOW_NOT_INIT) {
-      Serial.println("ESPNOW not Init.");
-    } else if (result == ESP_ERR_ESPNOW_ARG) {
-      Serial.println("Invalid Argument");
-    } else if (result == ESP_ERR_ESPNOW_INTERNAL) {
-      Serial.println("Internal Error");
-    } else if (result == ESP_ERR_ESPNOW_NO_MEM) {
-      Serial.println("ESP_ERR_ESPNOW_NO_MEM");
-    } else if (result == ESP_ERR_ESPNOW_NOT_FOUND) {
-      Serial.println("Peer not found.");
-    } else {
-      Serial.println("Not sure what happened");
-    }
-    */
-    delay(30);
+
+    delay(ESPNOW_SEND_WAIT_TIME);
 
 }

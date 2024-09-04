@@ -6,6 +6,7 @@ uint32_t MODE_C_Timer2 = 0;//タイマー
 //uint32_t MODE_C_deltaTime = millis() - MODE_C_Timer1;
 //uint32_t MODE_C_spentTime = millis() - MODE_C_startTime;
 
+int init_mag=0;
 
 int CountY=1;
 int PlusX=1;
@@ -88,6 +89,9 @@ void MODE_C_Init(){
 
     //
     //led.flash(100);
+
+    init_mag = FFT_CheckMagnitude();
+
 }
 //終了処理
 void MODE_C_Finish(){
@@ -168,13 +172,19 @@ void MODE_C_main(){
     int duty = 0;
     int value = analogRead(ANALOG_VR_PIN);
     
-    value = map(value,4095,0,1,2000);
+    value = map(value,4095,0,0,2000);
     int gain = map(value,2000,0,0,100);
     
     int mag = FFT_CheckMagnitude();
+    mag = mag - init_mag;
     duty = map(mag,0,value,0,200);
     if(duty > 120)duty = 120;
+    if(duty < 0)duty = 0;
     int brightness = map(duty,0,100,25,75);
+
+    Serial.print("mag:");
+    Serial.println(mag);
+
     //DUMP(duty);
     //Serial.println(duty);
 
@@ -203,12 +213,15 @@ void MODE_C_main(){
     if(duty>100){
       hue += 50;
     }
+    /*
     if(duty>90){
         currentMode = ALL;
         MODE_C_ResetSQ();
         TRACE();
     }
-    if(CountTime1/1000 > 5){
+    */
+    //5秒経過したら
+    if(CountTime1 > 5000){
       //hue += 50;
       MODE_C_Timer1 =millis();
     }
@@ -217,6 +230,7 @@ void MODE_C_main(){
     M5.Display.endWrite();
 
     //所定時間経過したら
+    /*
     if(millis() - MODE_C_Timer1 > 5000 && currentMode == ALL){
       //モード切り替え
       currentMode = YFRONT;
@@ -225,9 +239,9 @@ void MODE_C_main(){
       //タイマーリセット
       MODE_C_Timer1 = millis();
     }
-
+  */
     //所定時間経過したら
-    if(millis() - MODE_C_Timer2 > 1500){
+    if(millis() - MODE_C_Timer2 > 150000){
       //Counter処理
       if(currentMode == YFRONT){
         CountY++;

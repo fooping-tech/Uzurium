@@ -2,7 +2,7 @@
 arduinoFFT FFT;
 
 const uint16_t FFT_SAMPLES = 128; // サンプル数(2^x)
-const int FFT_TaskSpan = 100; // タスク実行間隔(ms)
+const int FFT_TaskSpan = 10; // タスク実行間隔(ms)
 const int FFT_TaskSpan_us = 10; // タスク実行間隔(us)
 int FFT_ADvalue=0;
 

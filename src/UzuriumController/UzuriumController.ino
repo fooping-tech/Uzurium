@@ -50,7 +50,7 @@ void setup(void)
   btn3.setup();
   led.setup(LED_PIN);
   //mac addr
-  Serial.println(WiFi.macAddress());
+  //Serial.println(WiFi.macAddress());
   //Core0 WDT無効化
   //disableCore0WDT();
   //Core0でタスク起動
@@ -112,6 +112,8 @@ void loop(void){
     int level = map(mag,0,value,0,11);
     DUMP(level);
     led.level2(level,level);
+
+
   }
 
 }

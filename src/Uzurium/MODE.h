@@ -259,6 +259,36 @@ public:
 
 };
 
+//追加
+class SerialControlMode : public MODE {
+public:
+    SerialControlMode(PHOTO *p,DCMPWM *m,RINGLED *l) : MODE(p,m,l) {
+
+     photo = p;
+     motor = m;
+     led = l;
+     led->setbrightness(25);
+     _InitMode=0;//初期化時のブザーモード
+     name="SerialControlMode";
+    _value=250;//ボタン選択時の色
+     Serial.print("<----");
+     Serial.print(name);
+     Serial.println("_begin---->");
+    }
+    // main関数をオーバーライド
+    void main() override {
+        //RPMを計測する
+        photo->CalcNowRPM();
+        //エッジがしばらく来ない場合にRPM初期化
+        photo->CheckTimeout();
+
+        motor->move(_duty);
+        led->fire2(4,_hue);
+        led->setbrightness(_brightness);
+    }
+  private:
+
+  };
 //=========Inspection Functions============
 
 class ADInspectionMode : public MODE {

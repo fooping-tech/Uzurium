@@ -1,3 +1,9 @@
+//==================================================
+//以下のバージョンのライブラリをArduinoに追加してください
+//M5Atom v0.1.2
+//arduinoFFT v1.6.2
+//FastLED v3.6.0
+//==================================================
 #include "./configuration.h"
 #if __has_include("Setting.h")
 #include "./Setting.h"
@@ -57,6 +63,7 @@ void setup() {
   //configTzTime("JST-9", "ntp.nict.jp"); 
   //timeInfo.tm_year + 1900 //timeInfo.tm_mon + 1 //timeInfo.tm_mday //timeInfo.tm_hour //timeInfo.tm_min //timeInfo.tm_sec
 
+  SERIAL_setup();
   //初期モードにセット
   if(switch2.check_a()==1){
     currentMode = new StopMode(&photo,&motor,&led);
@@ -211,7 +218,10 @@ void Uzurium_main(){
   if(currentMode->name=="ADInspectionMode"){
         Uzurium_Number =  map(FFT_CheckADvalue(),0,4095,1,18);
   }
-
+  //SerialControlModeのときはserial受信値をパラメータにセットする
+  if(currentMode->name=="SerialControlMode"){
+    currentMode->SetParams(SERIAL_CheckDuty(),SERIAL_CheckHue(),SERIAL_CheckBrightness());
+  }
 }
 
 void loop() {
@@ -224,4 +234,5 @@ void loop() {
   // if(WiFi.status() == WL_CONNECTED){
   //   Uzurium_Ntp();
   // }
+  SERIAL_InputCheck();
 }

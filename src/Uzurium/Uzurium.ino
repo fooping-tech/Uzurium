@@ -44,7 +44,7 @@ void initWiFi() {
 void setup() {
   //M5 INITIAL
 
-  M5.begin(true, false, true); 
+  M5.begin(false, false, false); 
   //MOTOR INITIAL
   motor.setup(CHANNEL,MOTOR_PIN);
   photo.setup(PHOTO_PIN);
@@ -66,10 +66,10 @@ void setup() {
   SERIAL_setup();
   //初期モードにセット
   if(switch2.check_a()==1){
-    currentMode = new StopMode(&photo,&motor,&led);
+    currentMode = new RemoteControlMode(&photo,&motor,&led);
   }
   else{
-    currentMode = new TestMode(&photo,&motor,&led);
+    currentMode = new RemoteControlMode(&photo,&motor,&led);
   }
   //Core0でタスク起動
   xTaskCreatePinnedToCore(
@@ -109,11 +109,11 @@ void Uzurium_CheckSW(){
   if(sw2st){
       if(sw2==0){
         delete currentMode;
-        currentMode = new TestMode(&photo,&motor,&led);
+        currentMode = new RemoteControlMode(&photo,&motor,&led);
       }
       else{
         delete currentMode;
-        currentMode = new StopMode(&photo,&motor,&led);
+        currentMode = new RemoteControlMode(&photo,&motor,&led);
       }
   }
 

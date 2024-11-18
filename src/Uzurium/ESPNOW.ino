@@ -1,7 +1,8 @@
 esp_now_peer_info_t slave;
 
 // MACアドレスを設定
-uint8_t specificMacAddress[] = {0x78, 0x21, 0x84, 0x95, 0x80, 0x10};
+//uint8_t specificMacAddress[] = {0x78, 0x21, 0x84, 0x95, 0x80, 0x10};
+uint8_t specificMacAddress[] = {0x10, 0x06, 0x1C, 0x0A, 0xBF, 0xF4};
 //uint8_t specificMacAddress[] = {0x08, 0x3A, 0xF2, 0x44, 0xF5, 0x90};
 
 int ESPNOW_duty =0;
@@ -31,13 +32,12 @@ void ESPNOW_setup(){
       //M5.Lcd.print("ESPNow Init Failed\n");
       ESP.restart();
     }
- 
-    slave.peer_addr[0] = (uint8_t)0x78;
-    slave.peer_addr[1] = (uint8_t)0x21;
-    slave.peer_addr[2] = (uint8_t)0x84;
-    slave.peer_addr[3] = (uint8_t)0x95;
-    slave.peer_addr[4] = (uint8_t)0x80;
-    slave.peer_addr[5] = (uint8_t)0x10;
+    slave.peer_addr[0] = (uint8_t)0x10;
+    slave.peer_addr[1] = (uint8_t)0x06;
+    slave.peer_addr[2] = (uint8_t)0x1C;
+    slave.peer_addr[3] = (uint8_t)0x0A;
+    slave.peer_addr[4] = (uint8_t)0xBF;
+    slave.peer_addr[5] = (uint8_t)0xF4;
     // マルチキャスト用Slave登録
     memset(&slave, 0, sizeof(slave));
   // 特定のMACアドレス（specificMacAddress）をpeerInfoにコピー
@@ -78,50 +78,11 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len) {
   for(int i=0;i<5;i++){
     if(mac_addr[i] != specificMacAddress[i])flag = false;
   }
-  if(flag){
-    int mode=data[0];
-    int value1=data[1];
-    int value2=data[2];
-    int value3=data[3];
-    int value4=data[4];
-  /*
-    for ( int i = 0 ; i < data_len ; i++ ) {
-      Serial.print(data[i]);
-      Serial.print(" ");
-    }
-    Serial.println("");
-  */
-  //mode=0のとき
-    if(mode==0){
-      switch(value1){
-          case 0:
-            delete currentMode;
-            currentMode = new StopMode(&photo,&motor,&led);
-            break;
-          case 4:
-            delete currentMode;
-            currentMode = new ADinputMode(&photo,&motor,&led);
-            break;
-          case 2:
-            delete currentMode;
-            currentMode = new FeedBackMode(&photo,&motor,&led);
-            break;
-          case 3:
-            delete currentMode;
-            currentMode = new TimerMode(&photo,&motor,&led);
-            break;
-          case 1:
-            delete currentMode;
-            currentMode = new RemoteControlMode(&photo,&motor,&led);
-            break;
-        }
-    }
-
-    //mode=1のとき
-    if(mode==1 && value1==Uzurium_Number){
-      ESPNOW_duty = value2;
-      ESPNOW_hue = value3;
-      ESPNOW_brightness = value4;
-    }
+  int id=data[0];
+  if(flag && id==5){
+    ESPNOW_duty = data[Uzurium_Number*3-2];
+    ESPNOW_hue = data[Uzurium_Number*3-1];
+    ESPNOW_brightness  = data[Uzurium_Number*3];
   }
 }
+

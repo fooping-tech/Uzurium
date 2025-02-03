@@ -135,7 +135,7 @@ void RINGLED::fire2(int mode,int hue){
     gPal = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::White);
   }
     if(mode==4){
-     hue+=150;//青色からスタートするためのオフセット
+     
      CRGB darkcolor  = CHSV(hue,255,192); // pure hue, three-quarters brightness
      CRGB lightcolor = CHSV(hue,128,255); // half 'whitened', full brightness
      gPal = CRGBPalette16( CRGB::Black, darkcolor, lightcolor, CRGB::White);
